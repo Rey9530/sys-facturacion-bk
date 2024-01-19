@@ -24,13 +24,13 @@ export class AllExceptionFilter implements ExceptionFilter {
     const msg =
       exception instanceof HttpException ? exception.getResponse() : exception;
 
-    this.logger.error(`Status ${status} Error: ${JSON.stringify(msg)}`);
+    this.logger.error(`Status ${status} Error: ${JSON.stringify(msg)}`); 
     response.status(status).json({
       time: new Date().toISOString(),
       path: request.url,
       data: typeof msg.message == 'string' ? msg.message : [...msg.message],
-      message: msg.message.toString(), 
-      status: msg.statusCode,
+      msg: msg.message.toString(), 
+      status: false,//msg.statusCode,
     });
   }
 }

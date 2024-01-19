@@ -9,10 +9,9 @@ import {
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto, UpdateUserDto } from './dto';
 import { JwtService } from '@nestjs/jwt';
-import { JwtPayload } from '../auth/interfaces';
-import { PasswordUserDto } from '../auth/dto/password-user.dto';
 import { PrismaService } from 'src/common/services';
-import { hos_usr_usuario } from '@prisma/client';
+import { Usuarios } from '@prisma/client'; 
+import { JwtPayload } from '../auth/interfaces';
 
 @Injectable()
 export class UsersService {
@@ -23,71 +22,100 @@ export class UsersService {
     private readonly jwtService: JwtService,
   ) { }
 
-  async create(createUserDto: CreateUserDto, user: hos_usr_usuario) {
-    try {
-      const { usr_password, ...resto } = createUserDto;
-      var data: any = {
-        usr_password: bcrypt.hashSync(usr_password, 10),
-        usr_user_create: user.usr_names + ' ' + user.usr_surnames,
-        usr_usrer_update: user.usr_names + ' ' + user.usr_surnames,
-        usr_code_employe: resto.usr_code,
-        usr_names: resto.usr_names,
-        usr_surnames: resto.usr_surnames,
-      };
-      const register = await this.prisma.hos_usr_usuario.create({
-        data,
-      });
-      delete register.usr_password;
-      return register;
-    } catch (error) {
-      this.handleDBExceptions(error);
+  async create(createUserDto: CreateUserDto, user: Usuarios) {
+
+    let { usuario, nombres, apellidos, dui, id_rol, id_sucursal, id_sucursal_reser = 0 } =
+      createUserDto;
+    id_rol = Number(id_rol)
+    const existeRol = await this.prisma.roles.findUnique({ where: { id_rol } });
+    if (!existeRol) {
+      throw new NotFoundException('"El registro del rol no existe"');
     }
-  }
-
-  async updatePassword(
-    passwordUserDto: PasswordUserDto,
-    user: hos_usr_usuario,
-  ) {
-    try {
-      const respDb = await this.prisma.hos_usr_usuario.findFirst({
-        where: { usr_code: user.usr_code },
+    id_sucursal = Number(id_sucursal)
+    if (id_sucursal > 0) {
+      const existeSucursal = await this.prisma.sucursales.findUnique({
+        where: { id_sucursal },
       });
+      if (!existeSucursal) throw new NotFoundException('"El registro de sucursal no existe"');
+    }
 
-      if (!respDb) throw new NotFoundException('Usuario no encontrado');
-      const password = passwordUserDto.curren_password;
-      if (!bcrypt.compareSync(password, respDb.usr_password))
-        throw new UnauthorizedException('Credenciales incorrectas');
+    const existeEmail = await this.prisma.usuarios.findFirst({
+      where: {
+        usuario,
+        estado: 'ACTIVO'
+      },
+    });
+    if (existeEmail) throw new NotFoundException(usuario + " ya existe");
+    try {
+      id_sucursal_reser = Number(id_sucursal_reser)
+      id_sucursal_reser = id_sucursal_reser > 0 ? id_sucursal_reser : null;
 
-      if (
-        bcrypt.compareSync(passwordUserDto.new_password, user.usr_password)
-      )
-        throw new UnauthorizedException(
-          'La nueva contraseña no debe ser la misma que la actual',
-        );
 
-      await this.prisma.hos_usr_usuario.update({
-        where: { usr_code: respDb.usr_code },
+      //encriptar clave 
+      const salt = bcrypt.genSaltSync();
+      let password = bcrypt.hashSync("1234", salt);
+
+      const userSaved = await this.prisma.usuarios.create({
         data: {
-          usr_password: bcrypt.hashSync(passwordUserDto.new_password, 10),
+          usuario,
+          password,
+          nombres,
+          apellidos,
+          dui,
+          id_rol,
+          id_sucursal,
+          id_sucursal_reser
         },
+        select: {
+          nombres: true,
+          apellidos: true,
+          dui: true,
+          usuario: true,
+          Roles: true,
+          Sucursales: true,
+          id: true,
+          id_sucursal_reser: true,
+          id_sucursal: true
+        }
       });
-      return;
+      // const token = await getenerarJWT(userSaved.id, userSaved.id_sucursal);
+      const token = await this.getJwtToken({ id: userSaved.id, id_sucursal: userSaved.id_sucursal });
+      return { ...userSaved, token };
     } catch (error) {
-      this.handleDBExceptions(error);
+      console.log(error)
+      throw new InternalServerErrorException("Error inesperado reviosar log");
     }
   }
 
-
+  private getJwtToken(payload: JwtPayload) {
+    const token = this.jwtService.sign(payload);
+    return token;
+  } 
 
   findAll() {
-    return this.prisma.hos_usr_usuario.findMany({
-      where: { usr_status: 'ACTIVE' },
+    return this.prisma.usuarios.findMany({
+      where: { estado: "ACTIVO" },
+      select: {
+        nombres: true,
+        apellidos: true,
+        dui: true,
+        usuario: true,
+        Roles: true,
+        Sucursales: true,
+        id: true,
+        id_sucursal_reser: true,
+      }
+    });
+  }
+  obtenerRoles() {
+    return this.prisma.roles.findMany({
+      where: { Estado: "ACTIVO" },
     });
   }
 
-  async findOne(term: string) {
-    let resp = await this.prisma.hos_usr_usuario.findFirst({
-      where: { usr_code: term, usr_status: 'ACTIVE' },
+  async findOne(term: number) {
+    let resp = await this.prisma.usuarios.findFirst({
+      where: { id: term, estado: "ACTIVO" },
     });
     if (!resp)
       throw new NotFoundException(`Usuario con el id ${term} no encontrada`);
@@ -96,38 +124,71 @@ export class UsersService {
   }
 
   async update(
-    id: string,
+    id: number,
     updateUserDto: UpdateUserDto,
-    user: hos_usr_usuario,
+    user: Usuarios,
   ) {
     await this.findOne(id);
-    try {
-      const { usr_password, ...resto } = updateUserDto;
-      var data: any = {
-        usr_password: bcrypt.hashSync(usr_password, 10),
-        usr_usrer_update: user.usr_names + ' ' + user.usr_surnames,
-        usr_code_employe: resto.usr_code,
-        usr_names: resto.usr_names,
-        usr_surnames: resto.usr_surnames,
-      };
-      const product = await this.prisma.hos_usr_usuario.update({
-        where: { usr_code: id },
-        data,
+    let uid: number = id;
+    const existeEmail = await this.prisma.usuarios.findFirst({
+      where: { id: uid, estado: "ACTIVO" },
+    });
+    if (!existeEmail) {
+      throw new NotFoundException("El usuario no existe o esta deshabilitado");
+    }
+
+    let { usuario, password, nombres, apellidos, dui, id_rol, id_sucursal, id_sucursal_reser = 0 } =
+      updateUserDto;
+    id_rol = Number(id_rol)
+    id_sucursal = Number(id_sucursal)
+    id_sucursal_reser = Number(id_sucursal_reser)
+    id_sucursal_reser = id_sucursal_reser > 0 ? id_sucursal_reser : null;
+    if (existeEmail.usuario != usuario) {
+      const existeEmail = await this.prisma.usuarios.findFirst({
+        where: { usuario },
       });
-      if (!product)
-        throw new NotFoundException(`Product with id: ${id} not found`);
-      return product;
+      if (existeEmail) throw new NotFoundException("Ya existe un registro con ese usuario");
+
+    }
+    const existeRol = await this.prisma.roles.findUnique({ where: { id_rol } });
+    if (!existeRol) throw new NotFoundException("El registro del rol no existe");
+
+    if (id_sucursal > 0) {
+      const existeSucursal = await this.prisma.sucursales.findUnique({
+        where: { id_sucursal },
+      });
+      if (!existeSucursal) throw new NotFoundException("El registro de la sucursal no existe");
+
+    }
+    try {
+      const usuarioUpdate = await this.prisma.usuarios.update({
+        where: { id: uid },
+        data: { usuario, password, nombres, apellidos, dui, id_rol, id_sucursal, id_sucursal_reser },
+      });
+      return { ...usuarioUpdate }
     } catch (error) {
-      this.handleDBExceptions(error);
+      console.log(error);
+      throw new InternalServerErrorException("Error inesperado reviosar log");
     }
   }
 
-  async remove(id: string) {
-    const resp = await this.findOne(id);
-    await this.prisma.hos_usr_usuario.update({
-      where: { usr_code: resp.usr_code },
-      data: { usr_status: 'INACTIVE' },
+
+  async remove(uid: number) {
+    const resp = await this.findOne(uid);
+    const existeEmail = await this.prisma.usuarios.findFirst({
+      where: { id: uid, estado: "ACTIVO" },
     });
+    if (!existeEmail) throw new NotFoundException("El usuario no existe o ya esta deshabilitado");
+    try {
+      await this.prisma.usuarios.update({
+        data: { estado: "INACTIVO" },
+        where: { id: uid },
+      });
+      return { msg: "Usuario elimiando" }
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException("Error inesperado reviosar log");
+    }
   }
 
 

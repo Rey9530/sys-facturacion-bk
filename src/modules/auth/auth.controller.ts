@@ -4,7 +4,7 @@ import { CreateAuthDto } from './dto/create-auth.dto';
 import { Auth, GetUser } from './decorators';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { HEADER_API_BEARER_AUTH } from 'src/common/const';
-import { hos_usr_usuario } from '@prisma/client';
+import { Usuarios } from '@prisma/client';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -12,16 +12,16 @@ export class AuthController {
   constructor(private readonly authService: AuthService) { }
 
 
-  @Post('login')
+  @Post('sign-in')
   loginUser(@Body() loginUserDto: CreateAuthDto) {
     return this.authService.login(loginUserDto);
   }
 
 
-  @Get('check-status')
+  @Get('sign-in-with-token')
   @Auth()
   @ApiBearerAuth(HEADER_API_BEARER_AUTH)
-  checkStatus(@GetUser() user: hos_usr_usuario) {
+  checkStatus(@GetUser() user: Usuarios) {
     return this.authService.checkStatus(user);
   }
 }

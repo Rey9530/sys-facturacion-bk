@@ -51,4 +51,5 @@ async function bootstrap() {
 }
 bootstrap()
   .then(() => logger.log('START API : ' + APP_URL + ':' + PORT))
+  .then(() => logger.log('API DOC START : ' + APP_URL + ':' + PORT + '/api'))
   .catch((error) => logger.error('Error: ', error));

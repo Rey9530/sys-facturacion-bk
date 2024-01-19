@@ -10,7 +10,7 @@ export class CreateAuthDto {
   })
   @IsString()
   @MinLength(1)
-  user_code: string;
+  usuario: string;
 
   @ApiProperty({
     description: 'Contraseña del usuario',
