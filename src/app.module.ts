@@ -5,6 +5,7 @@ import { SeedModule } from './modules/seed/seed.module';
 
 import { AuthModule } from './modules/auth/auth.module';
 import { PerfilModule } from './modules/perfil/perfil.module';
+import { FacturacionModule } from './modules/reportes/facturacion/facturacion.module';
 
 @Module({
   imports: [
@@ -12,7 +13,8 @@ import { PerfilModule } from './modules/perfil/perfil.module';
     UsersModule,
     SeedModule,
     AuthModule,
-    PerfilModule
+    PerfilModule,
+    FacturacionModule
   ],
   controllers: [],
   providers: [],
