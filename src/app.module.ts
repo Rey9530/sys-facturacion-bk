@@ -9,6 +9,7 @@ import { FacturacionModule } from './modules/reportes/facturacion/facturacion.mo
 import { ComprasModule } from './modules/reportes/compras/compras.module';
 import { EstadisticasModule } from './modules/estadisticas/estadisticas.module';
 import { AgendaModule } from './modules/agenda/agenda.module';
+import { CatalogoModule } from './modules/facturacion/catalogo/catalogo.module';
 
 @Module({
   imports: [
@@ -20,7 +21,8 @@ import { AgendaModule } from './modules/agenda/agenda.module';
     FacturacionModule,
     ComprasModule,
     EstadisticasModule,
-    AgendaModule
+    AgendaModule,
+    CatalogoModule
   ],
   controllers: [],
   providers: [],
