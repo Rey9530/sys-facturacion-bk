@@ -4,8 +4,7 @@ import { UsersService } from './users.service';
 import { Auth, GetUser } from 'src/modules/auth/decorators';
 import { CreateUserDto, UpdateUserDto } from './dto';
 import { Usuarios } from '@prisma/client';
-import { HEADER_API_BEARER_AUTH } from 'src/common/const';
-import { PasswordUserDto } from '../auth/dto/password-user.dto';
+import { HEADER_API_BEARER_AUTH } from 'src/common/const'; 
 
 
 @ApiTags('Usuarios')
