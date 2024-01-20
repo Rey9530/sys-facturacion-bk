@@ -8,6 +8,7 @@ import { PerfilModule } from './modules/perfil/perfil.module';
 import { FacturacionModule } from './modules/reportes/facturacion/facturacion.module';
 import { ComprasModule } from './modules/reportes/compras/compras.module';
 import { EstadisticasModule } from './modules/estadisticas/estadisticas.module';
+import { AgendaModule } from './modules/agenda/agenda.module';
 
 @Module({
   imports: [
@@ -18,7 +19,8 @@ import { EstadisticasModule } from './modules/estadisticas/estadisticas.module';
     PerfilModule,
     FacturacionModule,
     ComprasModule,
-    EstadisticasModule
+    EstadisticasModule,
+    AgendaModule
   ],
   controllers: [],
   providers: [],
