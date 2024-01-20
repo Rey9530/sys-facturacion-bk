@@ -7,6 +7,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { PerfilModule } from './modules/perfil/perfil.module';
 import { FacturacionModule } from './modules/reportes/facturacion/facturacion.module';
 import { ComprasModule } from './modules/reportes/compras/compras.module';
+import { EstadisticasModule } from './modules/estadisticas/estadisticas.module';
 
 @Module({
   imports: [
@@ -16,7 +17,8 @@ import { ComprasModule } from './modules/reportes/compras/compras.module';
     AuthModule,
     PerfilModule,
     FacturacionModule,
-    ComprasModule
+    ComprasModule,
+    EstadisticasModule
   ],
   controllers: [],
   providers: [],
