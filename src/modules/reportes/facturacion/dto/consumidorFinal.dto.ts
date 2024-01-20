@@ -1,16 +1,16 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsInt, IsPositive } from "class-validator";
+import { IsInt, IsNotEmpty, IsPositive, IsString } from "class-validator";
 
 export class ConsumidorFinalDto {
 
     @ApiProperty({})
-    @IsInt()
-    @IsPositive()
-    mes: number;
+    @IsString() 
+    @IsNotEmpty() 
+    mes: string;
 
 
     @ApiProperty({})
-    @IsInt()
-    @IsPositive()
-    anio: number;
+    @IsString()
+    @IsNotEmpty() 
+    anio: string;
 }

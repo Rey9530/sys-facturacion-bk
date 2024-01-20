@@ -6,7 +6,7 @@ export class CreateAuthDto {
     description: 'Codigo de usuario (unique)',
     nullable: false,
     minLength: 6,
-    example: '9505002',
+    example: 'usuario@demo.com',
   })
   @IsString()
   @MinLength(1)
@@ -16,7 +16,7 @@ export class CreateAuthDto {
     description: 'Contraseña del usuario',
     nullable: false,
     minLength: 6,
-    example: '9505002',
+    example: '1234',
   })
   @IsString()
   @MinLength(1)

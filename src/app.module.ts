@@ -6,6 +6,7 @@ import { SeedModule } from './modules/seed/seed.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { PerfilModule } from './modules/perfil/perfil.module';
 import { FacturacionModule } from './modules/reportes/facturacion/facturacion.module';
+import { ComprasModule } from './modules/reportes/compras/compras.module';
 
 @Module({
   imports: [
@@ -14,7 +15,8 @@ import { FacturacionModule } from './modules/reportes/facturacion/facturacion.mo
     SeedModule,
     AuthModule,
     PerfilModule,
-    FacturacionModule
+    FacturacionModule,
+    ComprasModule
   ],
   controllers: [],
   providers: [],

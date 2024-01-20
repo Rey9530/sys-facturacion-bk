@@ -12,17 +12,16 @@ export class FacturacionService {
   ) { }
 
   async consumidorFinal(params: ConsumidorFinalDto, ids) {
-
-    // let { ids = 0 } = req.params;
+ 
     let id_sucursal = Number(ids);
-    let { mes = 0, anio = 0 }: any = params;
-
+    let { mes = "0", anio = "0" }: any = params;
+    mes = Number(mes);
+    anio = Number(anio);
     mes = mes > 0 ? mes : 0;
     let diasMes: any = new Date(anio, mes, 0);
     mes = mes > 0 ? mes - 1 : 0;
     diasMes = diasMes.getDate();
-    var arrayDatos: any[] = [];
-    // for (let index = 14; index <= 15; index++) {
+    var arrayDatos: any[] = []; 
     let totales: any = {};
     totales.ventas_exentas = 0;
     totales.ventas_no_sujetas = 0;
@@ -111,7 +110,7 @@ export class FacturacionService {
     var hasta1: any = params.hasta!.toString().split("-");
     var desde = new Date(desde1[0], desde1[1] - 1, desde1[2], 0, 0, 0);
     var hasta = new Date(hasta1[0], hasta1[1] - 1, hasta1[2], 23, 59, 59);
-    var totales: any[] = [];
+    var totales: any[] = []; 
     var data = await this.prisma.facturas.findMany({
       where: {
         fecha_creacion: {
