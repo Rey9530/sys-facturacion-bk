@@ -11,6 +11,7 @@ import { EstadisticasModule } from './modules/estadisticas/estadisticas.module';
 import { AgendaModule } from './modules/agenda/agenda.module';
 import { CatalogoModule } from './modules/facturacion/catalogo/catalogo.module';
 import { SucursalesModule } from './modules/facturacion/sucursales/sucursales.module';
+import { CatalogoTiposModule } from './modules/facturacion/catalogo_tipos/catalogo_tipos.module';
 
 @Module({
   imports: [
@@ -24,7 +25,8 @@ import { SucursalesModule } from './modules/facturacion/sucursales/sucursales.mo
     EstadisticasModule,
     AgendaModule,
     CatalogoModule,
-    SucursalesModule
+    SucursalesModule,
+    CatalogoTiposModule
   ],
   controllers: [],
   providers: [],
