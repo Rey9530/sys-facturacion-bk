@@ -18,7 +18,8 @@ export class ProveedoresController {
   @Post()
   create(
     @Body() createProveedoreDto: CreateProveedoreDto,
-    @GetUser() user: Usuarios,) {
+    @GetUser() user: Usuarios,
+    ) {
     return this.proveedoresService.create(createProveedoreDto, user);
   }
 

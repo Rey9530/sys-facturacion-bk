@@ -20,6 +20,7 @@ import { BodegasModule } from './modules/inventario/bodegas/bodegas.module';
 import { IngresoModule } from './modules/inventario/ingreso/ingreso.module';
 import { OrdenSalidaModule } from './modules/inventario/orden-salida/orden-salida.module';
 import { ProveedoresModule } from './modules/inventario/proveedores/proveedores.module';
+import { ClienteModule } from './modules/facturacion/cliente/cliente.module';
 
 @Module({
   imports: [
@@ -42,7 +43,8 @@ import { ProveedoresModule } from './modules/inventario/proveedores/proveedores.
     BodegasModule,
     IngresoModule,
     OrdenSalidaModule,
-    ProveedoresModule
+    ProveedoresModule,
+    ClienteModule
   ],
   controllers: [],
   providers: [],
