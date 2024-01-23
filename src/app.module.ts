@@ -17,6 +17,7 @@ import { BloquesModule } from './modules/facturacion/bloques/bloques.module';
 import { DescuentosModule } from './modules/facturacion/descuentos/descuentos.module';
 import { SistemaDataModule } from './modules/facturacion/sistema_data/sistema_data.module';
 import { BodegasModule } from './modules/inventario/bodegas/bodegas.module';
+import { IngresoModule } from './modules/inventario/ingreso/ingreso.module';
 
 @Module({
   imports: [
@@ -36,7 +37,8 @@ import { BodegasModule } from './modules/inventario/bodegas/bodegas.module';
     BloquesModule,
     DescuentosModule,
     SistemaDataModule,
-    BodegasModule
+    BodegasModule,
+    IngresoModule
   ],
   controllers: [],
   providers: [],
