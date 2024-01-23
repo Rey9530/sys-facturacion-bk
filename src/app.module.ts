@@ -18,6 +18,7 @@ import { DescuentosModule } from './modules/facturacion/descuentos/descuentos.mo
 import { SistemaDataModule } from './modules/facturacion/sistema_data/sistema_data.module';
 import { BodegasModule } from './modules/inventario/bodegas/bodegas.module';
 import { IngresoModule } from './modules/inventario/ingreso/ingreso.module';
+import { OrdenSalidaModule } from './modules/inventario/orden-salida/orden-salida.module';
 
 @Module({
   imports: [
@@ -38,7 +39,8 @@ import { IngresoModule } from './modules/inventario/ingreso/ingreso.module';
     DescuentosModule,
     SistemaDataModule,
     BodegasModule,
-    IngresoModule
+    IngresoModule,
+    OrdenSalidaModule
   ],
   controllers: [],
   providers: [],
