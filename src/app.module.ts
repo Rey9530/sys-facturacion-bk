@@ -14,6 +14,7 @@ import { SucursalesModule } from './modules/facturacion/sucursales/sucursales.mo
 import { CatalogoTiposModule } from './modules/facturacion/catalogo_tipos/catalogo_tipos.module';
 import { CatalogoCategoriasModule } from './modules/facturacion/catalogo_categorias/catalogo_categorias.module';
 import { BloquesModule } from './modules/facturacion/bloques/bloques.module';
+import { DescuentosModule } from './modules/facturacion/descuentos/descuentos.module';
 
 @Module({
   imports: [
@@ -30,7 +31,8 @@ import { BloquesModule } from './modules/facturacion/bloques/bloques.module';
     SucursalesModule,
     CatalogoTiposModule,
     CatalogoCategoriasModule,
-    BloquesModule
+    BloquesModule,
+    DescuentosModule
   ],
   controllers: [],
   providers: [],

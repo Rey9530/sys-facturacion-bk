@@ -21,6 +21,7 @@ export class FechasAgendaDto {
     hasta: string;
 
 
+    @ApiProperty()
     @IsEnum(Turnos)
     @IsOptional()
     turno: Turnos;

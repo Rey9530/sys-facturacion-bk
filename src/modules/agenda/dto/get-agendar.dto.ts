@@ -8,8 +8,9 @@ export enum Turnos {
     DESAYUNO = 'DESAYUNO',
 }
 
-export class GetAgendaDto { 
-  
+export class GetAgendaDto {
+
+    @ApiProperty()
     @IsEnum(Turnos)
     @IsOptional()
     turno: Turnos;
@@ -17,6 +18,6 @@ export class GetAgendaDto {
 
     @ApiProperty({ example: '1' })
     @IsString()
-    @IsOptional() 
+    @IsOptional()
     id_sucursal: string;
-  }
+}
