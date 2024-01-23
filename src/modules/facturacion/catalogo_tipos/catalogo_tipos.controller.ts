@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, ParseIntPipe, Put } from '@nestjs/common';
 import { CatalogoTiposService } from './catalogo_tipos.service';
 import { CreateCatalogoTipoDto } from './dto/create-catalogo_tipo.dto';
 import { UpdateCatalogoTipoDto } from './dto/update-catalogo_tipo.dto';
@@ -28,7 +28,7 @@ export class CatalogoTiposController {
     return this.catalogoTiposService.create(createCatalogoTipoDto);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(@Param('id', ParseIntPipe) id: number, @Body() updateCatalogoTipoDto: UpdateCatalogoTipoDto) {
     return this.catalogoTiposService.update(id, updateCatalogoTipoDto);
   }

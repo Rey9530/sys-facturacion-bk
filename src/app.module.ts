@@ -12,6 +12,7 @@ import { AgendaModule } from './modules/agenda/agenda.module';
 import { CatalogoModule } from './modules/facturacion/catalogo/catalogo.module';
 import { SucursalesModule } from './modules/facturacion/sucursales/sucursales.module';
 import { CatalogoTiposModule } from './modules/facturacion/catalogo_tipos/catalogo_tipos.module';
+import { CatalogoCategoriasModule } from './modules/facturacion/catalogo_categorias/catalogo_categorias.module';
 
 @Module({
   imports: [
@@ -26,7 +27,8 @@ import { CatalogoTiposModule } from './modules/facturacion/catalogo_tipos/catalo
     AgendaModule,
     CatalogoModule,
     SucursalesModule,
-    CatalogoTiposModule
+    CatalogoTiposModule,
+    CatalogoCategoriasModule
   ],
   controllers: [],
   providers: [],
