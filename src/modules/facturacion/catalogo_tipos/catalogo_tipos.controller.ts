@@ -7,7 +7,7 @@ import { Auth } from 'src/modules/auth/decorators';
 import { HEADER_API_BEARER_AUTH } from 'src/common/const';
 
 @Controller('facturacion/catalogo_tipos')
-@ApiTags('catalogo tipos')
+@ApiTags('Tipos de Catalogo')
 @Auth()
 @ApiBearerAuth(HEADER_API_BEARER_AUTH)
 export class CatalogoTiposController {
