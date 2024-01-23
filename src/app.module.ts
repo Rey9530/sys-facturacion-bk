@@ -19,6 +19,7 @@ import { SistemaDataModule } from './modules/facturacion/sistema_data/sistema_da
 import { BodegasModule } from './modules/inventario/bodegas/bodegas.module';
 import { IngresoModule } from './modules/inventario/ingreso/ingreso.module';
 import { OrdenSalidaModule } from './modules/inventario/orden-salida/orden-salida.module';
+import { ProveedoresModule } from './modules/inventario/proveedores/proveedores.module';
 
 @Module({
   imports: [
@@ -40,7 +41,8 @@ import { OrdenSalidaModule } from './modules/inventario/orden-salida/orden-salid
     SistemaDataModule,
     BodegasModule,
     IngresoModule,
-    OrdenSalidaModule
+    OrdenSalidaModule,
+    ProveedoresModule
   ],
   controllers: [],
   providers: [],
