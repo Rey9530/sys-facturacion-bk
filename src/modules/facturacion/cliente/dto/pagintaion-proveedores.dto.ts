@@ -5,12 +5,12 @@ export class PaginationClienteDto {
 
 
     @ApiProperty({})
-    @IsPositive()
+    @IsString()
     @IsOptional()
     pagina: number;
     
     @ApiProperty({})
-    @IsPositive()
+    @IsString()
     @IsOptional()
     registrosXpagina: number;
 
