@@ -10,7 +10,7 @@ import { FechasAgendaDto } from './dto/fechas.dto';
 import { Usuarios } from '@prisma/client';
 
 @ApiTags('Agenda')
-@Controller('agenda')
+@Controller('reservas/agenda')
 @Auth()
 @ApiBearerAuth(HEADER_API_BEARER_AUTH)
 export class AgendaController {
