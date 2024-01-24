@@ -21,6 +21,7 @@ import { IngresoModule } from './modules/inventario/ingreso/ingreso.module';
 import { OrdenSalidaModule } from './modules/inventario/orden-salida/orden-salida.module';
 import { ProveedoresModule } from './modules/inventario/proveedores/proveedores.module';
 import { ClienteModule } from './modules/facturacion/cliente/cliente.module';
+import { FacturaModule } from './modules/facturacion/factura/factura.module';
 
 @Module({
   imports: [
@@ -44,7 +45,8 @@ import { ClienteModule } from './modules/facturacion/cliente/cliente.module';
     IngresoModule,
     OrdenSalidaModule,
     ProveedoresModule,
-    ClienteModule
+    ClienteModule,
+    FacturaModule
   ],
   controllers: [],
   providers: [],
