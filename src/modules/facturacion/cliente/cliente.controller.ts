@@ -24,7 +24,7 @@ import { Usuarios } from '@prisma/client';
 @Auth()
 @ApiBearerAuth(HEADER_API_BEARER_AUTH)
 export class ClienteController {
-  constructor(private readonly clienteService: ClienteService) {}
+  constructor(private readonly clienteService: ClienteService) { }
 
   @Post()
   create(
@@ -32,7 +32,7 @@ export class ClienteController {
 
     @GetUser() user: Usuarios,
   ) {
-    return this.clienteService.create(createClienteDto,user);
+    return this.clienteService.create(createClienteDto, user);
   }
 
   @Get()
@@ -40,8 +40,8 @@ export class ClienteController {
     return this.clienteService.findAll(query);
   }
   @Get("obtener/tipos/contribuyentes")
-  findAllTipos(@Query() query: PaginationClienteDto) {
-    return this.clienteService.findAll(query);
+  findAllTipos() {
+    return this.clienteService.findAllTipos();
   }
 
   @Get(':id')

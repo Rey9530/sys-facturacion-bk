@@ -18,7 +18,7 @@ export class AuthController {
   }
 
 
-  @Get('sign-in-with-token')
+  @Post('sign-in-with-token')
   @Auth()
   @ApiBearerAuth(HEADER_API_BEARER_AUTH)
   checkStatus(@GetUser() user: Usuarios) {
