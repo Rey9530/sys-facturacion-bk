@@ -252,6 +252,7 @@ export class FacturaService {
             },
           };
         }),
+        estado:'ACTIVO'
       },
       include: {
         Inventario: {

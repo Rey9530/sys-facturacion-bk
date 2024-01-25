@@ -3,6 +3,7 @@ import { IsEnum, IsOptional, IsString } from "class-validator";
 
 // ,,
 export enum Turnos {
+    '' = '',
     ALMUERZO = 'ALMUERZO',
     CENA = 'CENA',
     DESAYUNO = 'DESAYUNO',

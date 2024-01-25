@@ -237,6 +237,7 @@ export class AgendaService {
       });
       return registroActualizado;
     } catch (error) {
+      console.log(error)
       throw new InternalServerErrorException(error.response.message);
     }
   }

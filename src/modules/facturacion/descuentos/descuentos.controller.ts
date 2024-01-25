@@ -31,7 +31,7 @@ export class DescuentosController {
   listarTipos() {
     return this.descuentosService.listarTipos();
   }
-  @Get('listar/tipos')
+  @Get('listar/activos')
   listarActivos() {
     return this.descuentosService.listarActivos();
   }

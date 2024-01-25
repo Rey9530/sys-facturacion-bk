@@ -10,37 +10,26 @@ import {
 
 export class CreateFacturaDto {
   @ApiProperty({})
-  @IsString()
-  @MinLength(4)
+  @IsString() 
   cliente: string;
 
-  @ApiProperty({})
-  @IsString()
-  @MinLength(4)
+  @ApiProperty({}) 
   @IsOptional()
   direccion: string;
 
-  @ApiProperty({})
-  @IsString()
-  @MinLength(4)
+  @ApiProperty({}) 
   @IsOptional()
   no_registro: string;
 
-  @ApiProperty({})
-  @IsString()
-  @MinLength(4)
+  @ApiProperty({}) 
   @IsOptional()
   nit: string;
 
-  @ApiProperty({})
-  @IsString()
-  @MinLength(4)
+  @ApiProperty({}) 
   @IsOptional()
   giro: string;
 
-  @ApiProperty({})
-  @IsNumber()
-  @IsPositive()
+  @ApiProperty({}) 
   @IsOptional()
   id_municipio: number;
 
@@ -49,69 +38,47 @@ export class CreateFacturaDto {
   @IsPositive() 
   id_tipo_factura: number;
 
-  @ApiProperty({})
-  @IsNumber()
-  @IsPositive()
+  @ApiProperty({}) 
   @IsOptional()
   subtotal: number;
 
-  @ApiProperty({})
-  @IsNumber()
-  @IsPositive()
+  @ApiProperty({}) 
   @IsOptional()
   descuento: number;
 
-  @ApiProperty({})
-  @IsNumber()
-  @IsPositive()
+  @ApiProperty({}) 
   @IsOptional()
   iva: number;
 
-  @ApiProperty({})
-  @IsNumber()
-  @IsPositive()
+  @ApiProperty({}) 
   @IsOptional()
   iva_retenido: number;
 
-  @ApiProperty({})
-  @IsNumber()
-  @IsPositive()
+  @ApiProperty({}) 
   @IsOptional()
   iva_percivido: number;
 
-  @ApiProperty({})
-  @IsNumber()
-  @IsPositive()
+  @ApiProperty({}) 
   @IsOptional()
   total: number;
 
-  @ApiProperty({})
-  @IsNumber()
-  @IsPositive()
+  @ApiProperty({}) 
   @IsOptional()
   efectivo: number;
 
-  @ApiProperty({})
-  @IsNumber()
-  @IsPositive()
+  @ApiProperty({}) 
   @IsOptional()
   tarjeta: number;
 
-  @ApiProperty({})
-  @IsNumber()
-  @IsPositive()
+  @ApiProperty({}) 
   @IsOptional()
   cheque: number;
 
-  @ApiProperty({})
-  @IsNumber()
-  @IsPositive()
+  @ApiProperty({}) 
   @IsOptional()
   transferencia: number;
 
-  @ApiProperty({})
-  @IsNumber()
-  @IsPositive()
+  @ApiProperty({}) 
   @IsOptional()
   credito: number;
 
@@ -120,16 +87,12 @@ export class CreateFacturaDto {
   @IsPositive() 
   id_metodo_pago: number;
 
-  @ApiProperty({})
-  @IsNumber()
-  @IsPositive()
+  @ApiProperty({}) 
   @IsOptional()
   id_cliente: number;
 
-  @ApiProperty({})
-  @IsNumber()
-  @IsOptional()
-  @IsPositive()
+  @ApiProperty({}) 
+  @IsOptional() 
   id_descuento: number;
 
   @ApiProperty({})

@@ -55,7 +55,7 @@ export class AgendaController {
   @Put('cambiar_estado/:id')
   updateStatus(
     @Param('id') id: string,
-    @Query('estado') estado: string,
+    @Body('estado') estado: string,
     @GetUser() user: Usuarios
   ) {
     return this.agendaService.updateStatus(+id, estado);

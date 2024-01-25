@@ -61,7 +61,7 @@ export class FacturaController {
   }
 
   @Get('obtener_metodos_pago')
-  obntenerMetodosDePago(@Param('id', ParseIntPipe) id: number) {
+  obntenerMetodosDePago() {
     return this.facturaService.obntenerMetodosDePago();
   }
 
@@ -112,7 +112,7 @@ export class FacturaController {
     return this.facturaService.update(+id, updateFacturaDto);
   }
 
-  @Delete(':id')
+  @Delete('anular_factura/:id')
   remove(@Param('id', ParseIntPipe) id: number, @GetUser() user: Usuarios) {
     return this.facturaService.remove(id, user);
   }
