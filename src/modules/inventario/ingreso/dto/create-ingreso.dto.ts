@@ -40,15 +40,11 @@ export class CreateIngresoDto {
     tipo_pago: string
 
     @ApiProperty({ example: '30' })
-    @IsOptional()
-    @IsInt()
-    @IsPositive()
+    @IsOptional() 
     dias_credito: number;
 
     @ApiProperty({ example: '1' })
-    @IsOptional()
-    @IsInt()
-    @IsPositive()
+    @IsOptional() 
     id_bodega: number;
 
     @ApiProperty({ example: '15.56' })
@@ -57,23 +53,19 @@ export class CreateIngresoDto {
     subtotal: number;
 
     @ApiProperty({ example: '10.20' })
-    @IsOptional()
-    @IsPositive()
+    @IsOptional() 
     descuento: number;
 
     @ApiProperty({ example: '1.13' })
-    @IsOptional()
-    @IsPositive()
+    @IsOptional() 
     iva: number;
 
     @ApiProperty({ example: '0.10' })
-    @IsOptional()
-    @IsPositive()
+    @IsOptional() 
     iva_retenido
 
     @ApiProperty({ example: '0.11' })
-    @IsOptional()
-    @IsPositive()
+    @IsOptional() 
     iva_percivido: number;
 
     @ApiProperty({ example: '30.45' })

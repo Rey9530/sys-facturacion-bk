@@ -11,8 +11,7 @@ export class CompraServicioDto {
     id_proveedor: number;
 
     @ApiProperty({ example: '654' })
-    @IsString()
-    @MinLength(4)
+    @IsString() 
     numero_factura: string;
 
 
@@ -35,15 +34,13 @@ export class CompraServicioDto {
 
     @ApiProperty()
     @IsOptional()
-    @IsString()
-    @MinLength(4)
+    @IsString() 
     numero_quedan: string;    //  = "",
 
 
     @ApiProperty({ example: 'CONTADO' })
     @IsOptional()
-    @IsString()
-    @MinLength(4)
+    @IsString() 
     tipo_pago: string;    //  = "CONTADO",
 
     @ApiProperty({ example: '1' })
@@ -57,53 +54,42 @@ export class CompraServicioDto {
 
     @ApiProperty()
     @IsOptional()
-    @IsString()
-    @MinLength(4)
+    @IsString() 
     tipo_inventario: string;    //  = "MP", 
 
     @ApiProperty()
     @IsOptional()
-    @IsString()
-    @MinLength(4)
+    @IsString() 
     detalle: string;    //  = "",
 
 
 
-    @ApiProperty({ example: '1' })
-    @IsInt()
-    @IsPositive()
+    @ApiProperty({ example: '1' }) 
     @IsOptional()
     dias_credito: number;
 
-    @ApiProperty({ example: '1' })
-    @IsInt()
-    @IsPositive()
+    @ApiProperty({ example: '1' }) 
     @IsOptional()
     id_sucursal: number;
 
-    @ApiProperty({ example: '1' })
-    @IsPositive()
+    @ApiProperty({ example: '1' }) 
     @IsOptional()
     iva: number;
 
-    @ApiProperty({ example: '1' })
-    @IsPositive()
+    @ApiProperty({ example: '1' }) 
     @IsOptional()
     cesc: number;
 
-    @ApiProperty({ example: '1' })
-    @IsPositive()
+    @ApiProperty({ example: '1' }) 
     @IsOptional()
     iva_percivido: number;
 
 
-    @ApiProperty({ example: '1' })
-    @IsPositive()
+    @ApiProperty({ example: '1' }) 
     @IsOptional()
     fovial: number;
 
-    @ApiProperty({ example: '1' })
-    @IsPositive()
+    @ApiProperty({ example: '1' }) 
     @IsOptional()
     cotrans: number;
 

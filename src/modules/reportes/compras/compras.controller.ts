@@ -43,14 +43,14 @@ export class ComprasController {
   }
   @Get("obtener_listado_compras_al_credito/:id_sucursal/:id_proveedor")
   obtenerListadoComprasCredito(
-    @Query('id_sucursal', ParseIntPipe) id_sucursal: number,
-    @Query('id_proveedor', ParseIntPipe) id_proveedor: number,
+    @Query('id_sucursal') id_sucursal: number,
+    @Query('id_proveedor') id_proveedor: number,
   ) {
     return this.comprasService.obtenerListadoComprasCredito(id_sucursal, id_proveedor);
   }
   @Get("obtener_pre_cheques/:id_sucursal")
   obtenerPreCheques(
-    @Query('id_sucursal', ParseIntPipe) id_sucursal: number,
+    @Query('id_sucursal') id_sucursal: number,
   ) {
     return this.comprasService.obtenerPreCheques(id_sucursal);
   }

@@ -66,7 +66,7 @@ export class IngresoController {
     @Body() data: BuscarCatalogoDto,
     @GetUser() user: Usuarios
   ) {
-    return this.ingresoService.buscarCatalogo(data, user);
+    return this.ingresoService.buscarProveedores(data, user);
   }
 
   @Post("comprasACheque")

@@ -23,9 +23,7 @@ export class ServicioRDTO {
 
 
 
-    @ApiProperty({ example: '1' })
-    @IsInt()
-    @IsPositive()
+    @ApiProperty({ example: '1' }) 
     @IsOptional()
     id_sucursal: number;
 
@@ -44,8 +42,7 @@ export class ServicioRDTO {
 
     @ApiProperty({ example: '021545' })
     @IsString()
-    @IsOptional()
-    @MinLength(4)
+    @IsOptional() 
     tipo_inventario: string;
 
     @ApiProperty({ example: '021545' })

@@ -20,16 +20,12 @@ export class PaginationIngresoDto {
     query: string;
 
 
-    @ApiProperty({ example: '1' })
-    @IsInt()
-    @IsPositive()
+    @ApiProperty({ example: '1' }) 
     @IsOptional()
     sucursal: number;
 
 
-    @ApiProperty({ example: '1' })
-    @IsInt()
-    @IsPositive()
+    @ApiProperty({ example: '1' }) 
     @IsOptional()
     bodega: number;
 }
