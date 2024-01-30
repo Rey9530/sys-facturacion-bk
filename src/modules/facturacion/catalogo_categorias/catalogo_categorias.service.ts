@@ -12,11 +12,11 @@ export class CatalogoCategoriasService {
 
 
   async create(createCatalogoCategoriaDto: CreateCatalogoCategoriaDto) {
-    let { nombre = "" } = createCatalogoCategoriaDto;
+    let { nombre = "", id_categoria_padre = null } = createCatalogoCategoriaDto;
     try {
       const data = await this.prisma.catalogoCategorias.create({
         data: {
-          nombre
+          nombre, id_categoria_padre
         },
       });
       return data;
@@ -29,6 +29,21 @@ export class CatalogoCategoriasService {
   async findAll() {
     const registros = await this.prisma.catalogoCategorias.findMany({
       where: { estado: "ACTIVO" },
+      include: { categoria_padre: true },
+      orderBy: { id_categoria: "asc" },
+    });
+    const total = await registros.length;
+    return {
+      registros,
+      total,
+    };
+  }
+
+  async findAllGroup() {
+    const registros = await this.prisma.catalogoCategorias.findMany({
+      where: { estado: "ACTIVO", id_categoria_padre: null },
+      include: { categoria_hijos: { where: { estado: 'ACTIVO' } } },
+      orderBy: { id_categoria: "asc" },
     });
     const total = await registros.length;
     return {
@@ -53,10 +68,10 @@ export class CatalogoCategoriasService {
     await this.findOne(uid);
     try {
 
-      let { nombre = "" } = updateCatalogoCategoriaDto;
+      let { nombre = "", id_categoria_padre = null } = updateCatalogoCategoriaDto;
       const registroActualizado = await this.prisma.catalogoCategorias.update({
         where: { id_categoria: uid },
-        data: { nombre },
+        data: { nombre, id_categoria_padre },
       });
       return registroActualizado;
     } catch (error) {

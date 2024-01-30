@@ -83,7 +83,7 @@ export class CatalogoService {
     const total = await this.prisma.catalogo.count({ where });
     const registros = await this.prisma.catalogo.findMany({
       where,
-      include: { Tipo: true, Categorias: true },
+      include: { Tipo: true, Categorias: { include: { categoria_padre: true } } },
       take: registrosXpagina,
       skip: (pagina - 1) * registrosXpagina,
     });
@@ -160,7 +160,7 @@ export class CatalogoService {
     }
   }
 
-  async remove(uid: number) { 
+  async remove(uid: number) {
     const registro = await this.prisma.catalogo.findFirst({
       where: { id_catalogo: uid, estado: "ACTIVO" },
     });

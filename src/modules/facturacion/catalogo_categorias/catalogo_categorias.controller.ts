@@ -17,6 +17,10 @@ export class CatalogoCategoriasController {
   findAll() {
     return this.catalogoCategoriasService.findAll();
   }
+  @Get("group")
+  findAllGroup() {
+    return this.catalogoCategoriasService.findAllGroup();
+  }
   @Post()
   create(@Body() createCatalogoCategoriaDto: CreateCatalogoCategoriaDto) {
     return this.catalogoCategoriasService.create(createCatalogoCategoriaDto);

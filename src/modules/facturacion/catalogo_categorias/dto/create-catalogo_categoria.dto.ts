@@ -1,12 +1,15 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString, MinLength } from "class-validator";
+import { IsOptional, IsString, MinLength } from "class-validator";
 
 export class CreateCatalogoCategoriaDto {
 
     @ApiProperty({})
     @IsString()
     @MinLength(2)
-    nombre: string;
+    nombre: string; 
 
+    @ApiProperty({}) 
+    @IsOptional()
+    id_categoria_padre: number;
 
 }

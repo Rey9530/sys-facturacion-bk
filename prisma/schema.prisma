@@ -117,10 +117,13 @@ model Bodegas {
 
 // Tablas del modulo Facturacion
 model CatalogoCategorias {
-  id_categoria Int        @id @default(autoincrement())
-  nombre       String
-  estado       Estado     @default(ACTIVO)
-  catalogo     Catalogo[]
+  id_categoria       Int                  @id @default(autoincrement())
+  nombre             String
+  estado             Estado               @default(ACTIVO)
+  id_categoria_padre Int?
+  categoria_padre    CatalogoCategorias?  @relation("categoria_padre", fields: [id_categoria_padre], references: [id_categoria], onDelete: NoAction, onUpdate: NoAction, map: "categoria_padre_fk")
+  categoria_hijos    CatalogoCategorias[] @relation("categoria_padre")
+  catalogo           Catalogo[]
 }
 
 model CatalogoTipo {
