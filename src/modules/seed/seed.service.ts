@@ -7,23 +7,19 @@ export class SeedService {
   private readonly logger = new Logger('UsersService');
 
   constructor(private readonly prisma: PrismaService) { }
+
+
+  async obtenerNombresDeTablas(prisma) {
+    // Esta consulta obtiene los nombres de todas las tablas públicas que no son del sistema
+    const tablas = await prisma.$queryRaw`SELECT tablename FROM pg_tables WHERE schemaname='public' AND tablename NOT LIKE 'pg_%' AND tablename NOT LIKE '_prisma_%' AND tablename NOT LIKE 'sql_%';`;
+    return tablas.map(t => t.tablename);
+  }
+
   async deleteSeed() {
-    await this.prisma.usuarios.deleteMany();
-    await this.prisma.facturasTipos.deleteMany();
-    await this.prisma.bancos.deleteMany();
-    await this.prisma.tiposCliente.deleteMany();
-    await this.prisma.facturasMetodosDePago.deleteMany();
-    await this.prisma.departamentos.deleteMany();
-    await this.prisma.municipios.deleteMany();
-    await this.prisma.catalogoCategorias.deleteMany();
-    await this.prisma.catalogoTipo.deleteMany();
-    await this.prisma.motivoSalida.deleteMany();
-    await this.prisma.sucursales.deleteMany();
-    await this.prisma.cliente.deleteMany();
-    await this.prisma.roles.deleteMany();
-    await this.prisma.usuarios.deleteMany();
-    await this.prisma.generalData.deleteMany();
-    await this.prisma.municipios.deleteMany();
+    const tablas = await this.obtenerNombresDeTablas(this.prisma); 
+    for (const nombreTabla of tablas) {
+      await this.prisma.$executeRawUnsafe(`TRUNCATE TABLE "${nombreTabla}" RESTART IDENTITY CASCADE;`);
+    } 
   }
 
   async executeSeed() {
@@ -31,38 +27,44 @@ export class SeedService {
       await this.deleteSeed();
       await this.prisma.facturasTipos.createMany({
         data: [
-          {  nombre: "Factura", codigo: "01" }, 
-          {  nombre: "Comprobante de crédito fiscal", codigo: "03" }, 
-          {  nombre: "Nota de remisión", codigo: "04" }, 
-          {  nombre: "Nota de crédito", codigo: "05" }, 
-          {  nombre: "Nota de débito", codigo: "06" }, 
-          {  nombre: "Comprobante de retención", codigo: "07" }, 
-          {  nombre: "Comprobante de liquidación", codigo: "08" }, 
-          {  nombre: "Documento contable de liquidación", codigo: "09" }, 
-          {  nombre: "Facturas de exportación", codigo: "11" }, 
-          {  nombre: "Factura de sujeto excluido", codigo: "14" },   
-          {  nombre: "Comprobante de donación ", codigo: "15" },   
+          { nombre: "Factura", codigo: "01" },
+          { nombre: "Comprobante de crédito fiscal", codigo: "03" },
+          { nombre: "Nota de remisión", codigo: "04" },
+          { nombre: "Nota de crédito", codigo: "05" },
+          { nombre: "Nota de débito", codigo: "06" },
+          { nombre: "Comprobante de retención", codigo: "07" },
+          { nombre: "Comprobante de liquidación", codigo: "08" },
+          { nombre: "Documento contable de liquidación", codigo: "09" },
+          { nombre: "Facturas de exportación", codigo: "11" },
+          { nombre: "Factura de sujeto excluido", codigo: "14" },
+          { nombre: "Comprobante de donación ", codigo: "15" },
         ],
-      }); 
+      });
       await this.prisma.dTETipoEstablecimiento.createMany({
         data: [
-          {  nombre: "Sucursal / Agencia", codigo: "01" },  
-          {  nombre: "Casa matriz", codigo: "02" },  
-          {  nombre: "Bodega", codigo: "04" },  
-          {  nombre: "Predio y/o patio", codigo: "07" },  
-          {  nombre: "Otro", codigo: "20" },  
+          { nombre: "Sucursal / Agencia", codigo: "01" },
+          { nombre: "Casa matriz", codigo: "02" },
+          { nombre: "Bodega", codigo: "04" },
+          { nombre: "Predio y/o patio", codigo: "07" },
+          { nombre: "Otro", codigo: "20" },
         ],
-      }); 
+      });
+      await this.prisma.dTEActividadEconomica.createMany({
+        data: [
+          { nombre: "Ventas de electronica", codigo: "01" }, 
+          { nombre: "Ventas de articulos varios", codigo: "02" }, 
+        ],
+      });
       await this.prisma.dTETipoDocumentoIdentificacion.createMany({
-        data: [ 
-          {  nombre: "NIT", codigo: "36" },  
-          {  nombre: "DUI ", codigo: "13" },  
-          {  nombre: "Otro", codigo: "37" },  
-          {  nombre: "Pasaporte", codigo: "03" },  
-          {  nombre: "Carnet de Residente ", codigo: "02" },  
+        data: [
+          { nombre: "NIT", codigo: "36" },
+          { nombre: "DUI ", codigo: "13" },
+          { nombre: "Otro", codigo: "37" },
+          { nombre: "Pasaporte", codigo: "03" },
+          { nombre: "Carnet de Residente ", codigo: "02" },
         ],
-      });  
- 
+      });
+
       await this.prisma.bancos.createMany({
         data: [
           { nombre: "Banco Agrícola" },
@@ -606,11 +608,8 @@ export class SeedService {
       //SUCURSAL DEMO
       await this.prisma.sucursales.createMany({
         data: [
-          { nombre: "Sucursal 1" },
-          { nombre: "Sucursal 2" },
-          { nombre: "Sucursal 3" },
-          { nombre: "Sucursal 4" },
-          { nombre: "Sucursal 5" },
+          { nombre: "Casa Matriz", correo: "demo@demo.com", telefono: "60457278", complemento: "San salvador", id_municipio: 1, id_tipo_establecimiento: 2 },
+          { nombre: "Sucursal 2", correo: "demo@demo.com", telefono: "60457278", complemento: "San salvador", id_municipio: 1, id_tipo_establecimiento: 1 },
         ]
       });
 
@@ -656,7 +655,7 @@ export class SeedService {
           id_sucursal: 1,
           id_sucursal_reser: 1
         },
-      }); 
+      });
 
       await this.prisma.generalData.create({
         data: {

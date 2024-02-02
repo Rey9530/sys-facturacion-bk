@@ -8,44 +8,53 @@ export class UpdateSistemaDatumDto {
     nombre_sistema: string;
 
     @ApiProperty({})
-    @IsPositive() 
+    @IsPositive()
     impuesto: number;
 
     @ApiProperty({})
-    @IsInt() 
-    @IsOptional() 
+    @IsInt()
+    @IsOptional()
     id_tipo_contribuyente: number;
 
     @ApiProperty({})
     @IsString()
+    @MinLength(3)
+    nombre_comercial: string;
+
+    @ApiProperty({})
+    @IsPositive()
+    id_actividad_economica: number;
+
+    @ApiProperty({})
+    @IsString()
     @MinLength(4)
-    @IsOptional() 
+    @IsOptional()
     direccion: string;
 
     @ApiProperty({})
     @IsString()
     @MinLength(4)
-    @IsOptional() 
+    @IsOptional()
     razon: string;
 
     @ApiProperty({})
     @IsString()
     @MinLength(4)
-    @IsOptional() 
+    @IsOptional()
     nit: string;
 
     @ApiProperty({})
     @IsString()
     @MinLength(4)
-    @IsOptional() 
+    @IsOptional()
     nrc: string;
 
     @ApiProperty({})
     @IsString()
     @MinLength(4)
-    @IsOptional() 
+    @IsOptional()
     contactos: string;
 }
- 
+
 
 

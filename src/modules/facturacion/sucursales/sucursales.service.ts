@@ -13,12 +13,21 @@ export class SucursalesService {
   ) { }
 
   async create(createSucursaleDto: CreateSucursaleDto) {
-    let { nombre = "", color = "" } = createSucursaleDto;
+    let {
+      nombre = "",
+      color = "",
+      telefono = "",
+      id_municipio = 0,
+      id_tipo_establecimiento = 0,
+    } = createSucursaleDto;
     try {
       return await this.prisma.sucursales.create({
         data: {
           nombre,
+          id_municipio,
+          telefono,
           color,
+          id_tipo_establecimiento
         },
       });
 
@@ -36,6 +45,13 @@ export class SucursalesService {
     }
     const registros = await this.prisma.sucursales.findMany({
       where: { estado: "ACTIVO", ...wSucursal },
+      include: {
+        Municipio: {
+          include: {
+            Departamento: true
+          }
+        }, DTETipoEstablecimiento: true
+      }
     });
     const total = await registros.length;
     return {
@@ -52,14 +68,30 @@ export class SucursalesService {
 
     return registros;
   }
+  async findType() {
+    return await this.prisma.dTETipoEstablecimiento.findMany({
+      where: { estado: "ACTIVO" },
+    });
+  }
 
   async update(uid: number, updateSucursaleDto: UpdateSucursaleDto) {
     await this.findOne(uid);
     try {
-      let { nombre = "", color = "" } = updateSucursaleDto;
+      let {
+        nombre = "",
+        color = "",
+        telefono = "",
+        id_municipio = 0,
+        id_tipo_establecimiento = 0, } = updateSucursaleDto;
       const registroActualizado = await this.prisma.sucursales.update({
         where: { id_sucursal: uid },
-        data: { nombre, color },
+        data: {
+          nombre,
+          id_municipio,
+          telefono,
+          color,
+          id_tipo_establecimiento
+        },
       });
       return registroActualizado
     } catch (error) {

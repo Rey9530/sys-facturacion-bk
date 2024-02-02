@@ -30,6 +30,10 @@ export class SucursalesController {
   findOne(@Param('id') id: string) {
     return this.sucursalesService.findOne(+id);
   }
+  @Get('get/tipos')
+  findType() {
+    return this.sucursalesService.findType();
+  }
 
   @Put(':id')
   update(@Param('id') id: string, @Body() updateSucursaleDto: UpdateSucursaleDto) {

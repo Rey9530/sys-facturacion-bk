@@ -61,7 +61,7 @@ model GeneralData {
   nrc                   String?
   cod_actividad         String?
   desc_actividad        String?
-  nombreComercial       String?
+  nombre_comercial       String?
   contactos             String?
   impuesto              Float?        @default(0.13)
   id_tipo_contribuyente Int?
@@ -144,21 +144,20 @@ model CatalogoTipo {
 }
 
 model Catalogo {
-  id_catalogo         Int                @id @default(autoincrement())
-  id_tipo             Int
-  id_categoria        Int
-  codigo              String?            @db.Text
-  nombre              String
-  descripcion         String?            @db.Text
-  precio_sin_iva      Float?             @default(0)
-  precio_con_iva      Float?             @default(0)
-  existencias_minimas Int?               @default(0)
-  existencias_maximas Int?               @default(0)
-  Tipo                CatalogoTipo       @relation(fields: [id_tipo], references: [id_tipo], onDelete: NoAction, onUpdate: NoAction, map: "fk_tipo_catalogo")
-  Categorias          CatalogoCategorias @relation(fields: [id_categoria], references: [id_categoria], onDelete: NoAction, onUpdate: NoAction, map: "fk_categoria_sefvicio")
-  estado              Estado             @default(ACTIVO)
-  fecha_creacion      DateTime           @default(now()) @db.Timestamptz()
-
+  id_catalogo          Int                    @id @default(autoincrement())
+  id_tipo              Int
+  id_categoria         Int
+  codigo               String?                @db.Text
+  nombre               String
+  descripcion          String?                @db.Text
+  precio_sin_iva       Float?                 @default(0)
+  precio_con_iva       Float?                 @default(0)
+  existencias_minimas  Int?                   @default(0)
+  existencias_maximas  Int?                   @default(0)
+  Tipo                 CatalogoTipo           @relation(fields: [id_tipo], references: [id_tipo], onDelete: NoAction, onUpdate: NoAction, map: "fk_tipo_catalogo")
+  Categorias           CatalogoCategorias     @relation(fields: [id_categoria], references: [id_categoria], onDelete: NoAction, onUpdate: NoAction, map: "fk_categoria_sefvicio")
+  estado               Estado                 @default(ACTIVO)
+  fecha_creacion       DateTime               @default(now()) @db.Timestamptz()
   FacturasDetalle      FacturasDetalle[]
   ComprasDetalle       ComprasDetalle[]
   Kardex               Kardex[]
