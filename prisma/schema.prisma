@@ -61,8 +61,9 @@ model GeneralData {
   nrc                   String?
   cod_actividad         String?
   desc_actividad        String?
-  nombre_comercial       String?
+  nombre_comercial      String?
   contactos             String?
+  ambiente              String?       @default("00") //00=pruebas, 01=produccion
   impuesto              Float?        @default(0.13)
   id_tipo_contribuyente Int?
   TipoCliente           TiposCliente? @relation(fields: [id_tipo_contribuyente], references: [id_tipo_cliente], onDelete: NoAction, onUpdate: NoAction, map: "fk_sistema_tipo")
@@ -190,10 +191,11 @@ model FacturasTipos {
 }
 
 model DTEActividadEconomica {
-  id_actividad Int    @id @default(autoincrement())
+  id_actividad Int       @id @default(autoincrement())
   nombre       String
   codigo       String
-  estado       Estado @default(ACTIVO)
+  estado       Estado    @default(ACTIVO)
+  Cliente      Cliente[]
 }
 
 model DTETipoEstablecimiento {
@@ -302,12 +304,11 @@ model Cliente {
   fecha_creacion                 DateTime                        @default(now())
   Facturas                       Facturas[]
   id_sucursal                    Int?
-  Sucursal                       Sucursales?                     @relation(fields: [id_sucursal], references: [id_sucursal], onDelete: NoAction, onUpdate: NoAction, map: "fk_cliente_sucursal")
+  Sucursal                       Sucursales?                     @relation(fields: [id_sucursal], references: [id_sucursal], onDelete: NoAction, onUpdate: NoAction, map: "fk_cliente_sucursal") 
   id_tipo_documento              Int?
-  num_ducumento_identificacion   String?                         @default("")
-  cod_actividad                  String?
-  desc_actividad                 String?
   DTETipoDocumentoIdentificacion DTETipoDocumentoIdentificacion? @relation(fields: [id_tipo_documento], references: [id_tipo_documento], onDelete: NoAction, onUpdate: NoAction, map: "fk_cliente_tipo_documento")
+  id_actividad_economica         Int?
+  DTEActividadEconomica          DTEActividadEconomica?          @relation(fields: [id_actividad_economica], references: [id_actividad], onDelete: NoAction, onUpdate: NoAction, map: "fk_cliente_actividad_economica")
   id_tipo_cliente                Int?
   TipoCliente                    TiposCliente?                   @relation(fields: [id_tipo_cliente], references: [id_tipo_cliente], onDelete: NoAction, onUpdate: NoAction, map: "fk_cliente_tipo")
 

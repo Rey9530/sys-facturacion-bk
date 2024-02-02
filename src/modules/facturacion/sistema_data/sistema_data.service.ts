@@ -14,10 +14,9 @@ export class SistemaDataService {
   async findAll() {
     try {
       const data = await this.prisma.generalData.findFirst();
-      let actividad_economica = await this.prisma.dTEActividadEconomica.findFirst({ where: { codigo: data.cod_actividad } });
-      return { ...data, id_actividad_economica: actividad_economica.id_actividad };
+      let actividad_economica = await this.prisma.dTEActividadEconomica.findFirst({ where: { codigo: data.cod_actividad ?? "00" } });
+      return { ...data, id_actividad_economica: actividad_economica != null ? actividad_economica.id_actividad : 0 };
     } catch (error) {
-      console.log(error);
       throw new InternalServerErrorException('Error inesperado reviosar log');
     }
   }
@@ -38,6 +37,7 @@ export class SistemaDataService {
         nit = "",
         nrc = "",
         nombre_comercial = "",
+        ambientefacturacion = "",
         contactos = "",
       } = updateSistemaDatumDto;
       id_tipo_contribuyente = Number(id_tipo_contribuyente);
@@ -59,7 +59,8 @@ export class SistemaDataService {
           id_tipo_contribuyente,
           nombre_comercial,
           cod_actividad: actividad_economica.codigo,
-          desc_actividad: actividad_economica.nombre
+          desc_actividad: actividad_economica.nombre,
+          ambiente: ambientefacturacion
         },
       });
       return "Registro actualizado con exito";

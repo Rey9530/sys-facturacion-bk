@@ -43,6 +43,14 @@ export class ClienteController {
   findAllTipos() {
     return this.clienteService.findAllTipos();
   }
+  @Get("obtener/tipos/documentos")
+  findAllTiposDocumentos() {
+    return this.clienteService.findAllTiposDocumentos();
+  }
+  @Get("obtener/actividades/economicas")
+  findAllActividadEconomica() {
+    return this.clienteService.findAllActividadEconomica();
+  }
 
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {

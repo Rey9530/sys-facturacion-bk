@@ -48,11 +48,13 @@ export class SeedService {
           { nombre: "Predio y/o patio", codigo: "07" },
           { nombre: "Otro", codigo: "20" },
         ],
-      });
+      }); 
+      
       await this.prisma.dTEActividadEconomica.createMany({
         data: [
-          { nombre: "Ventas de electronica", codigo: "01" }, 
-          { nombre: "Ventas de articulos varios", codigo: "02" }, 
+          { nombre: "Cultivo de cereales excepto arroz y para forrajes", codigo: "01111" },  
+          { nombre: "Cultivo de legumbres", codigo: "01112" },  
+          { nombre: "Cultivo de semillas oleaginosas", codigo: "01113" },  
         ],
       });
       await this.prisma.dTETipoDocumentoIdentificacion.createMany({

@@ -11,7 +11,7 @@ import { Usuarios } from '@prisma/client';
 
 @Injectable()
 export class ClienteService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async create(createClienteDto: CreateClienteDto, user: Usuarios) {
     let id_sucursal = Number(user.id_sucursal);
@@ -23,6 +23,8 @@ export class ClienteService {
       nit = '',
       id_municipio = 0,
       id_tipo_cliente = 0,
+      id_tipo_documento = 0,
+      id_actividad_economica = 0,
       direccion = '',
       telefono = '',
       correo = '',
@@ -46,6 +48,30 @@ export class ClienteService {
           'El tipo de cliente seleccionado no existe',
         );
     }
+    id_tipo_documento = Number(id_tipo_documento);
+    id_tipo_documento = id_tipo_documento > 0 ? id_tipo_documento : null;
+    if (id_tipo_documento > 0) {
+      const documentoIdentificacion = await this.prisma.dTETipoDocumentoIdentificacion.findFirst({
+        where: { id_tipo_documento },
+      });
+      if (!documentoIdentificacion)
+        throw new NotFoundException(
+          'El tipo de documento seleccionado no existe',
+        );
+    }
+
+    id_actividad_economica = Number(id_actividad_economica);
+    id_actividad_economica = id_actividad_economica > 0 ? id_actividad_economica : null;
+    if (id_actividad_economica > 0) {
+      const documentoIdentificacion = await this.prisma.dTEActividadEconomica.findFirst({
+        where: { id_actividad: id_actividad_economica },
+      });
+      if (!documentoIdentificacion)
+        throw new NotFoundException(
+          'La actividad economica seleccionada no existe',
+        );
+    }
+
     id_municipio = Number(id_municipio);
     if (id_municipio > 0) {
       const municipio = await this.prisma.municipios.findFirst({
@@ -73,6 +99,8 @@ export class ClienteService {
           dui,
           id_sucursal,
           id_tipo_cliente,
+          id_tipo_documento,
+          id_actividad_economica
         },
         select: {
           id_cliente: true,
@@ -159,6 +187,16 @@ export class ClienteService {
       where: { estado: 'ACTIVO' },
     });
   }
+  async findAllTiposDocumentos() {
+    return await this.prisma.dTETipoDocumentoIdentificacion.findMany({
+      where: { estado: 'ACTIVO' },
+    });
+  }
+  async findAllActividadEconomica() {
+    return await this.prisma.dTEActividadEconomica.findMany({
+      where: { estado: 'ACTIVO' },
+    });
+  }
   async findOneInvoice(uid: number) {
     uid = uid > 0 ? uid : 0;
     const registros = await this.prisma.cliente.findFirst({
@@ -183,6 +221,8 @@ export class ClienteService {
       nit = '',
       id_municipio = 0,
       id_tipo_cliente = 0,
+      id_tipo_documento = 0,
+      id_actividad_economica = 0,
       direccion = '',
       telefono = '',
       correo = '',
@@ -211,6 +251,18 @@ export class ClienteService {
     //   }
     // }
 
+    id_actividad_economica = Number(id_actividad_economica);
+    id_actividad_economica = id_actividad_economica > 0 ? id_actividad_economica : null;
+    if (id_actividad_economica > 0) {
+      const documentoIdentificacion = await this.prisma.dTEActividadEconomica.findFirst({
+        where: { id_actividad: id_actividad_economica },
+      });
+      if (!documentoIdentificacion)
+        throw new NotFoundException(
+          'La actividad economica seleccionada no existe',
+        );
+    }
+
     id_tipo_cliente = Number(id_tipo_cliente);
     id_tipo_cliente = id_tipo_cliente > 0 ? id_tipo_cliente : null;
     if (id_tipo_cliente > 0) {
@@ -220,6 +272,18 @@ export class ClienteService {
       if (!tipoCliente)
         throw new NotFoundException(
           'El tipo de cliente seleccionado no existe',
+        );
+    }
+
+    id_tipo_documento = Number(id_tipo_documento);
+    id_tipo_documento = id_tipo_documento > 0 ? id_tipo_documento : null;
+    if (id_tipo_documento > 0) {
+      const documentoIdentificacion = await this.prisma.dTETipoDocumentoIdentificacion.findFirst({
+        where: { id_tipo_documento },
+      });
+      if (!documentoIdentificacion)
+        throw new NotFoundException(
+          'El tipo de documento seleccionado no existe',
         );
     }
 
@@ -250,6 +314,8 @@ export class ClienteService {
           correo,
           dui,
           id_tipo_cliente,
+          id_tipo_documento,
+          id_actividad_economica
         },
         select: {
           id_cliente: true,

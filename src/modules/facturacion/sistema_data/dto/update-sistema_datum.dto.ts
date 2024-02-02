@@ -38,6 +38,10 @@ export class UpdateSistemaDatumDto {
     razon: string;
 
     @ApiProperty({})
+    @IsString()  
+    ambientefacturacion: string;
+
+    @ApiProperty({})
     @IsString()
     @MinLength(4)
     @IsOptional()

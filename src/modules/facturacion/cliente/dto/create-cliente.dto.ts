@@ -26,6 +26,14 @@ export class CreateClienteDto {
   @IsOptional()
   nit: string;
 
+  @ApiProperty({}) 
+  @IsOptional()
+  id_tipo_documento: number;
+
+  @ApiProperty({}) 
+  @IsOptional()
+  id_actividad_economica: number;
+
   @ApiProperty({})
   @IsPositive()
   @IsOptional()

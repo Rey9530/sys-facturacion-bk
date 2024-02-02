@@ -36,7 +36,7 @@ export class BloquesService {
           hasta,
           actual,
           serie,
-          id_tipo_factura,
+          id_tipo_factura, 
           id_sucursal,
           resolucion
         },
