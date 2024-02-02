@@ -59,6 +59,9 @@ model GeneralData {
   razon                 String?
   nit                   String?
   nrc                   String?
+  cod_actividad         String?
+  desc_actividad        String?
+  nombreComercial       String?
   contactos             String?
   impuesto              Float?        @default(0.13)
   id_tipo_contribuyente Int?
@@ -87,18 +90,25 @@ model Bancos {
 }
 
 model Sucursales {
-  id_sucursal     Int               @id @default(autoincrement())
-  nombre          String
-  color           String?
-  estado          Estado            @default(ACTIVO)
-  Bodegas         Bodegas[]
-  Usuarios        Usuarios[]
-  FacturasBloques FacturasBloques[]
-  Cliente         Cliente[]
-  Facturas        Facturas[]
-  Compras         Compras[]
-  Agenda          Agenda[]
-  CierresDiarios  CierresDiarios[]
+  id_sucursal             Int                     @id @default(autoincrement())
+  nombre                  String
+  color                   String?
+  complemento             String?
+  telefono                String?
+  correo                  String?
+  id_municipio            Int?
+  Municipio               Municipios?             @relation(fields: [id_municipio], references: [id_municipio], onDelete: NoAction, onUpdate: NoAction, map: "fk_sucursal_municipio")
+  id_tipo_establecimiento Int?
+  DTETipoEstablecimiento  DTETipoEstablecimiento? @relation(fields: [id_tipo_establecimiento], references: [id_tipo_establecimiento], onDelete: NoAction, onUpdate: NoAction, map: "fk_sucursal_tipo_establecimiento")
+  estado                  Estado                  @default(ACTIVO)
+  Bodegas                 Bodegas[]
+  Usuarios                Usuarios[]
+  FacturasBloques         FacturasBloques[]
+  Cliente                 Cliente[]
+  Facturas                Facturas[]
+  Compras                 Compras[]
+  Agenda                  Agenda[]
+  CierresDiarios          CierresDiarios[]
 }
 
 model Bodegas {
@@ -180,6 +190,29 @@ model FacturasTipos {
   Compras         Compras[]
 }
 
+model DTEActividadEconomica {
+  id_actividad Int    @id @default(autoincrement())
+  nombre       String
+  codigo       String
+  estado       Estado @default(ACTIVO)
+}
+
+model DTETipoEstablecimiento {
+  id_tipo_establecimiento Int          @id @default(autoincrement())
+  nombre                  String
+  codigo                  String
+  estado                  Estado       @default(ACTIVO)
+  Sucursales              Sucursales[]
+}
+
+model DTETipoDocumentoIdentificacion {
+  id_tipo_documento Int       @id @default(autoincrement())
+  nombre            String
+  codigo            String
+  estado            Estado    @default(ACTIVO)
+  Cliente           Cliente[]
+}
+
 model FacturasMetodosDePago {
   id_metodo_pago Int        @id @default(autoincrement())
   nombre         String
@@ -237,6 +270,7 @@ model Municipios {
   Facturas    Facturas[]
   Cliente     Cliente[]
   Proveedores Proveedores[]
+  Sucursales  Sucursales[]
 
   @@index([id_departamento], name: "fk_municipio_departamento_id")
 }
@@ -251,27 +285,32 @@ model TiposCliente {
 }
 
 model Cliente {
-  id_cliente      Int           @id @default(autoincrement())
-  nombre          String?       @default("")
-  giro            String?       @default("")
-  razon_social    String?       @default("")
-  registro_nrc    String?       @default("")
-  nit             String?       @default("")
-  id_municipio    Int?          @default(0)
-  Municipio       Municipios?   @relation(fields: [id_municipio], references: [id_municipio], onDelete: NoAction, onUpdate: NoAction, map: "fk_cliente_municipio")
-  direccion       String?       @default("")
-  telefono        String?       @default("")
-  correo          String?       @default("")
-  dui             String?       @default("")
-  foto_url_nrc    String?       @default("")
-  foto_obj_nrc    String?       @db.Text
-  estado          Estado        @default(ACTIVO)
-  fecha_creacion  DateTime      @default(now())
-  Facturas        Facturas[]
-  id_sucursal     Int?
-  Sucursal        Sucursales?   @relation(fields: [id_sucursal], references: [id_sucursal], onDelete: NoAction, onUpdate: NoAction, map: "fk_cliente_sucursal")
-  id_tipo_cliente Int?
-  TipoCliente     TiposCliente? @relation(fields: [id_tipo_cliente], references: [id_tipo_cliente], onDelete: NoAction, onUpdate: NoAction, map: "fk_cliente_tipo")
+  id_cliente                     Int                             @id @default(autoincrement())
+  nombre                         String?                         @default("")
+  giro                           String?                         @default("")
+  razon_social                   String?                         @default("")
+  registro_nrc                   String?                         @default("")
+  nit                            String?                         @default("")
+  id_municipio                   Int?                            @default(0)
+  Municipio                      Municipios?                     @relation(fields: [id_municipio], references: [id_municipio], onDelete: NoAction, onUpdate: NoAction, map: "fk_cliente_municipio")
+  direccion                      String?                         @default("")
+  telefono                       String?                         @default("")
+  correo                         String?                         @default("")
+  dui                            String?                         @default("")
+  foto_url_nrc                   String?                         @default("")
+  foto_obj_nrc                   String?                         @db.Text
+  estado                         Estado                          @default(ACTIVO)
+  fecha_creacion                 DateTime                        @default(now())
+  Facturas                       Facturas[]
+  id_sucursal                    Int?
+  Sucursal                       Sucursales?                     @relation(fields: [id_sucursal], references: [id_sucursal], onDelete: NoAction, onUpdate: NoAction, map: "fk_cliente_sucursal")
+  id_tipo_documento              Int?
+  num_ducumento_identificacion   String?                         @default("")
+  cod_actividad                  String?
+  desc_actividad                 String?
+  DTETipoDocumentoIdentificacion DTETipoDocumentoIdentificacion? @relation(fields: [id_tipo_documento], references: [id_tipo_documento], onDelete: NoAction, onUpdate: NoAction, map: "fk_cliente_tipo_documento")
+  id_tipo_cliente                Int?
+  TipoCliente                    TiposCliente?                   @relation(fields: [id_tipo_cliente], references: [id_tipo_cliente], onDelete: NoAction, onUpdate: NoAction, map: "fk_cliente_tipo")
 
   @@index([id_tipo_cliente], name: "fk_cliente_tipo_id")
   @@index([id_sucursal], name: "fk_cliente_sucursal_id")

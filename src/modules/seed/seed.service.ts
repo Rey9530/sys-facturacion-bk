@@ -31,14 +31,38 @@ export class SeedService {
       await this.deleteSeed();
       await this.prisma.facturasTipos.createMany({
         data: [
-          { id_tipo_factura: 1, nombre: "Consumidor Final", codigo: "01" },
-          { id_tipo_factura: 2, nombre: "Credito Fiscal", codigo: "03" },
-          { id_tipo_factura: 3, nombre: "Recibo", codigo: "00" },
-          { id_tipo_factura: 4, nombre: "Nota de crédito", codigo: "05" },
-          { id_tipo_factura: 5, nombre: "Nota de débito", codigo: "06" },
+          {  nombre: "Factura", codigo: "01" }, 
+          {  nombre: "Comprobante de crédito fiscal", codigo: "03" }, 
+          {  nombre: "Nota de remisión", codigo: "04" }, 
+          {  nombre: "Nota de crédito", codigo: "05" }, 
+          {  nombre: "Nota de débito", codigo: "06" }, 
+          {  nombre: "Comprobante de retención", codigo: "07" }, 
+          {  nombre: "Comprobante de liquidación", codigo: "08" }, 
+          {  nombre: "Documento contable de liquidación", codigo: "09" }, 
+          {  nombre: "Facturas de exportación", codigo: "11" }, 
+          {  nombre: "Factura de sujeto excluido", codigo: "14" },   
+          {  nombre: "Comprobante de donación ", codigo: "15" },   
         ],
-      });
-
+      }); 
+      await this.prisma.dTETipoEstablecimiento.createMany({
+        data: [
+          {  nombre: "Sucursal / Agencia", codigo: "01" },  
+          {  nombre: "Casa matriz", codigo: "02" },  
+          {  nombre: "Bodega", codigo: "04" },  
+          {  nombre: "Predio y/o patio", codigo: "07" },  
+          {  nombre: "Otro", codigo: "20" },  
+        ],
+      }); 
+      await this.prisma.dTETipoDocumentoIdentificacion.createMany({
+        data: [ 
+          {  nombre: "NIT", codigo: "36" },  
+          {  nombre: "DUI ", codigo: "13" },  
+          {  nombre: "Otro", codigo: "37" },  
+          {  nombre: "Pasaporte", codigo: "03" },  
+          {  nombre: "Carnet de Residente ", codigo: "02" },  
+        ],
+      });  
+ 
       await this.prisma.bancos.createMany({
         data: [
           { nombre: "Banco Agrícola" },
