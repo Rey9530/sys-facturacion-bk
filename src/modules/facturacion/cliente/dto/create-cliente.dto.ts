@@ -34,13 +34,11 @@ export class CreateClienteDto {
   @IsOptional()
   id_actividad_economica: number;
 
-  @ApiProperty({})
-  @IsPositive()
+  @ApiProperty({}) 
   @IsOptional()
   id_municipio: number;
 
-  @ApiProperty({})
-  @IsPositive()
+  @ApiProperty({}) 
   @IsOptional()
   id_tipo_cliente: number;
 

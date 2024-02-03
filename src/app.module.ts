@@ -22,6 +22,7 @@ import { OrdenSalidaModule } from './modules/inventario/orden-salida/orden-salid
 import { ProveedoresModule } from './modules/inventario/proveedores/proveedores.module';
 import { ClienteModule } from './modules/facturacion/cliente/cliente.module';
 import { FacturaModule } from './modules/facturacion/factura/factura.module';
+import { ElectronicaModule } from './modules/facturacion/electronica/electronica.module';
 
 @Module({
   imports: [
@@ -46,7 +47,8 @@ import { FacturaModule } from './modules/facturacion/factura/factura.module';
     OrdenSalidaModule,
     ProveedoresModule,
     ClienteModule,
-    FacturaModule
+    FacturaModule,
+    ElectronicaModule
   ],
   controllers: [],
   providers: [],

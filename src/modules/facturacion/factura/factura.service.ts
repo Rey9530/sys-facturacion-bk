@@ -12,10 +12,14 @@ import {
   BuscartCatalogoDto,
   FechasFacturaDto,
 } from './dto';
+import { ElectronicaService } from '../electronica/electronica.service';
 
 @Injectable()
 export class FacturaService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly serviceDTE: ElectronicaService,
+  ) { }
 
   async create(createFacturaDto: CreateFacturaDto, user: Usuarios) {
     let {
@@ -144,7 +148,7 @@ export class FacturaService {
     }
     const bloque = tipoFactura?.Bloques[0];
     const id_bloque = tipoFactura?.Bloques[0].id_bloque;
-    const numero_factura = bloque?.actual.toString().padStart(6, '0');
+    const numero_factura = bloque?.actual.toString().padStart(10, '0');
     const factura = await this.prisma.facturas.create({
       data: {
         id_sucursal,
@@ -194,15 +198,23 @@ export class FacturaService {
         where: { id_factura: factura.id_factura },
         include: {
           FacturasDetalle: true,
+          Sucursal: { include: { DTETipoEstablecimiento: true, Municipio: { include: { Departamento: true } } } },
           Bloque: {
-            select: {
-              Tipo: { select: { nombre: true } },
-              tira: true,
-              serie: true,
+            include: {
+              Tipo: true,
             },
           },
+          Cliente: {
+            include: {
+              // Sucursal: { include: { Municipio: { include: { Departamento: true } } } },
+              Municipio: { include: { Departamento: true } },
+              DTEActividadEconomica: true,
+              DTETipoDocumentoIdentificacion: true,
+            }
+          }
         },
       });
+      this.serviceDTE.generarFacturaElectronica(facturaCreada);
       return facturaCreada;
     } catch (error) {
       console.log(error);
@@ -252,7 +264,7 @@ export class FacturaService {
             },
           };
         }),
-        estado:'ACTIVO'
+        estado: 'ACTIVO'
       },
       include: {
         Inventario: {
@@ -384,8 +396,10 @@ export class FacturaService {
         total_facturas_credito_fiscal++;
       }
     });
+    let tipoInvalidacion = await this.prisma.dTETipoInvalidacion.findMany({ where: { estado: 'ACTIVO' } });
 
     return {
+      tipoInvalidacion,
       data,
       contadores: {
         total_facturado,
@@ -466,6 +480,28 @@ export class FacturaService {
       return tipoFactura;
     }
   }
+  async resendDte(id_factura: number, user: Usuarios) {
+    const facturaCreada = await this.prisma.facturas.findUnique({
+      where: { id_factura: id_factura },
+      include: {
+        FacturasDetalle: true,
+        Sucursal: { include: { DTETipoEstablecimiento: true, Municipio: { include: { Departamento: true } } } },
+        Bloque: {
+          include: {
+            Tipo: true,
+          },
+        },
+        Cliente: {
+          include: {
+            Municipio: { include: { Departamento: true } },
+            DTEActividadEconomica: true,
+            DTETipoDocumentoIdentificacion: true,
+          }
+        }
+      },
+    });
+    return await this.serviceDTE.generarFacturaElectronica(facturaCreada);
+  }
 
   async findOne(id: number) {
     return `This action returns a #${id} factura`;
@@ -475,17 +511,43 @@ export class FacturaService {
     return `This action updates a #${id} factura`;
   }
 
-  async remove(id_factura: number, user: Usuarios) {
+  async remove(id_factura: number, user: Usuarios, tipoAnulacion: number, motivoAnulacion: string) {
     let id_sucursal = Number(user.id_sucursal);
     const data = await this.prisma.facturas.findMany({
       where: { estado: 'ACTIVO', id_factura, id_sucursal },
     });
+
     if (!data) throw new NotFoundException('La factura no existe');
+    const facturaCreada = await this.prisma.facturas.findUnique({
+      where: { id_factura },
+      include: {
+        FacturasDetalle: true,
+        Sucursal: { include: { DTETipoEstablecimiento: true, Municipio: { include: { Departamento: true } } } },
+        Bloque: {
+          include: {
+            Tipo: true,
+          },
+        },
+        Cliente: {
+          include: {
+            // Sucursal: { include: { Municipio: { include: { Departamento: true } } } },
+            Municipio: { include: { Departamento: true } },
+            DTEActividadEconomica: true,
+            DTETipoDocumentoIdentificacion: true,
+          }
+        }
+      },
+    });
+    var usuario = await this.prisma.usuarios.findFirst({
+      where: { id: user.id, estado: 'ACTIVO' },
+      include: { DTETipoDocumentoIdentificacion: true }
+    });
+    let resp = await this.serviceDTE.anularFacturaElectronica(facturaCreada, usuario, tipoAnulacion, motivoAnulacion);
     await this.prisma.facturas.update({
       where: { id_factura },
       data: { estado: 'ANULADA' },
     });
-    return 'Factura anulada con exito';
+    return resp;
   }
 
   async descargarItemDeInventario(item: any, nomero_factura: any = 0) {

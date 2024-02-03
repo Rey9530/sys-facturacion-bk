@@ -10,7 +10,7 @@ import * as bcrypt from 'bcrypt';
 import { CreateUserDto, UpdateUserDto } from './dto';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/common/services';
-import { Usuarios } from '@prisma/client'; 
+import { Usuarios } from '@prisma/client';
 import { JwtPayload } from '../auth/interfaces';
 
 @Injectable()
@@ -24,7 +24,7 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto, user: Usuarios) {
 
-    let { usuario, nombres, apellidos, dui, id_rol, id_sucursal, id_sucursal_reser = 0 } =
+    let { usuario, nombres, apellidos, dui, id_rol, id_sucursal, id_sucursal_reser = 0, id_tipo_documento = 0 } =
       createUserDto;
     id_rol = Number(id_rol)
     const existeRol = await this.prisma.roles.findUnique({ where: { id_rol } });
@@ -38,6 +38,20 @@ export class UsersService {
       });
       if (!existeSucursal) throw new NotFoundException('"El registro de sucursal no existe"');
     }
+
+
+    id_tipo_documento = Number(id_tipo_documento);
+    id_tipo_documento = id_tipo_documento > 0 ? id_tipo_documento : null;
+    if (id_tipo_documento > 0) {
+      const documentoIdentificacion = await this.prisma.dTETipoDocumentoIdentificacion.findFirst({
+        where: { id_tipo_documento },
+      });
+      if (!documentoIdentificacion)
+        throw new NotFoundException(
+          'El tipo de documento seleccionado no existe',
+        );
+    }
+
 
     const existeEmail = await this.prisma.usuarios.findFirst({
       where: {
@@ -64,7 +78,8 @@ export class UsersService {
           dui,
           id_rol,
           id_sucursal,
-          id_sucursal_reser
+          id_sucursal_reser,
+          id_tipo_documento
         },
         select: {
           nombres: true,
@@ -75,7 +90,9 @@ export class UsersService {
           Sucursales: true,
           id: true,
           id_sucursal_reser: true,
-          id_sucursal: true
+          id_sucursal: true,
+          id_tipo_documento: true,
+          DTETipoDocumentoIdentificacion: true
         }
       });
       // const token = await getenerarJWT(userSaved.id, userSaved.id_sucursal);
@@ -90,7 +107,7 @@ export class UsersService {
   private getJwtToken(payload: JwtPayload) {
     const token = this.jwtService.sign(payload);
     return token;
-  } 
+  }
 
   findAll() {
     return this.prisma.usuarios.findMany({
@@ -104,6 +121,8 @@ export class UsersService {
         Sucursales: true,
         id: true,
         id_sucursal_reser: true,
+        id_tipo_documento: true,
+        DTETipoDocumentoIdentificacion: true
       }
     });
   }
@@ -137,7 +156,7 @@ export class UsersService {
       throw new NotFoundException("El usuario no existe o esta deshabilitado");
     }
 
-    let { usuario, password, nombres, apellidos, dui, id_rol, id_sucursal, id_sucursal_reser = 0 } =
+    let { usuario, password, nombres, apellidos, dui, id_rol, id_sucursal, id_sucursal_reser = 0, id_tipo_documento = 0 } =
       updateUserDto;
     id_rol = Number(id_rol)
     id_sucursal = Number(id_sucursal)
@@ -150,6 +169,20 @@ export class UsersService {
       if (existeEmail) throw new NotFoundException("Ya existe un registro con ese usuario");
 
     }
+
+
+    id_tipo_documento = Number(id_tipo_documento);
+    id_tipo_documento = id_tipo_documento > 0 ? id_tipo_documento : null;
+    if (id_tipo_documento > 0) {
+      const documentoIdentificacion = await this.prisma.dTETipoDocumentoIdentificacion.findFirst({
+        where: { id_tipo_documento },
+      });
+      if (!documentoIdentificacion)
+        throw new NotFoundException(
+          'El tipo de documento seleccionado no existe',
+        );
+    }
+
     const existeRol = await this.prisma.roles.findUnique({ where: { id_rol } });
     if (!existeRol) throw new NotFoundException("El registro del rol no existe");
 
@@ -163,7 +196,7 @@ export class UsersService {
     try {
       const usuarioUpdate = await this.prisma.usuarios.update({
         where: { id: uid },
-        data: { usuario, password, nombres, apellidos, dui, id_rol, id_sucursal, id_sucursal_reser },
+        data: { usuario, password, nombres, apellidos, dui, id_rol, id_sucursal, id_sucursal_reser, id_tipo_documento },
       });
       return { ...usuarioUpdate }
     } catch (error) {

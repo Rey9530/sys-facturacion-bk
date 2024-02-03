@@ -16,10 +16,10 @@ export class SeedService {
   }
 
   async deleteSeed() {
-    const tablas = await this.obtenerNombresDeTablas(this.prisma); 
+    const tablas = await this.obtenerNombresDeTablas(this.prisma);
     for (const nombreTabla of tablas) {
       await this.prisma.$executeRawUnsafe(`TRUNCATE TABLE "${nombreTabla}" RESTART IDENTITY CASCADE;`);
-    } 
+    }
   }
 
   async executeSeed() {
@@ -48,13 +48,20 @@ export class SeedService {
           { nombre: "Predio y/o patio", codigo: "07" },
           { nombre: "Otro", codigo: "20" },
         ],
-      }); 
-      
+      });
+      await this.prisma.dTETipoInvalidacion.createMany({
+        data: [
+          { nombre: "Error en la Información del Documento Tributario Electrónico a invalidar.", codigo: "1" },
+          { nombre: "Rescindir de la operación realizada", codigo: "2" },
+          { nombre: "Otro", codigo: "3" },
+        ],
+      });
+
       await this.prisma.dTEActividadEconomica.createMany({
         data: [
-          { nombre: "Cultivo de cereales excepto arroz y para forrajes", codigo: "01111" },  
-          { nombre: "Cultivo de legumbres", codigo: "01112" },  
-          { nombre: "Cultivo de semillas oleaginosas", codigo: "01113" },  
+          { nombre: "Cultivo de cereales excepto arroz y para forrajes", codigo: "01111" },
+          { nombre: "Cultivo de legumbres", codigo: "01112" },
+          { nombre: "Cultivo de semillas oleaginosas", codigo: "01113" },
         ],
       });
       await this.prisma.dTETipoDocumentoIdentificacion.createMany({

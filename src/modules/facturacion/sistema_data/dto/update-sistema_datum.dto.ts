@@ -38,7 +38,7 @@ export class UpdateSistemaDatumDto {
     razon: string;
 
     @ApiProperty({})
-    @IsString()  
+    @IsString()
     ambientefacturacion: string;
 
     @ApiProperty({})
@@ -58,6 +58,21 @@ export class UpdateSistemaDatumDto {
     @MinLength(4)
     @IsOptional()
     contactos: string;
+
+
+
+    @ApiProperty({})
+    @IsOptional()
+    cod_estable_MH: string;
+    @ApiProperty({})
+    @IsOptional()
+    cod_estable: string;
+    @ApiProperty({})
+    @IsOptional()
+    cod_punto_venta_MH: string;
+    @ApiProperty({})
+    @IsOptional()
+    cod_punto_venta: string;
 }
 
 

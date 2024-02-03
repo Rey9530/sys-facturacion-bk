@@ -27,7 +27,7 @@ import {
 @Auth()
 @ApiBearerAuth(HEADER_API_BEARER_AUTH)
 export class FacturaController {
-  constructor(private readonly facturaService: FacturaService) {}
+  constructor(private readonly facturaService: FacturaService) { }
 
   @Post()
   create(
@@ -86,6 +86,14 @@ export class FacturaController {
     return this.facturaService.getNumeroFactura(id, user);
   }
 
+  @Get('resend_dte/:id')
+  resendDte(
+    @Param('id', ParseIntPipe) id: number,
+    @GetUser() user: Usuarios,
+  ) {
+    return this.facturaService.resendDte(id, user);
+  }
+
   @Get('obtener_municipios/:id')
   obtenerListadoMunicipios(@Param('id', ParseIntPipe) id: number) {
     return this.facturaService.obtenerListadoMunicipios(id);
@@ -113,7 +121,12 @@ export class FacturaController {
   }
 
   @Delete('anular_factura/:id')
-  remove(@Param('id', ParseIntPipe) id: number, @GetUser() user: Usuarios) {
-    return this.facturaService.remove(id, user);
+  remove(
+    @Param('id', ParseIntPipe) id: number,
+    @Query('tipeInvalidation', ParseIntPipe) tipeInvalidation: number,
+    @Query('motiveInvalidation') motiveInvalidation: string,
+    @GetUser() user: Usuarios,
+  ) {
+    return this.facturaService.remove(id, user, tipeInvalidation, motiveInvalidation);
   }
 }

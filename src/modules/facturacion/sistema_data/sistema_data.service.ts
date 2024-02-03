@@ -39,6 +39,10 @@ export class SistemaDataService {
         nombre_comercial = "",
         ambientefacturacion = "",
         contactos = "",
+        cod_estable_MH = "",
+        cod_estable = "",
+        cod_punto_venta_MH = "",
+        cod_punto_venta = "",
       } = updateSistemaDatumDto;
       id_tipo_contribuyente = Number(id_tipo_contribuyente);
       id_tipo_contribuyente =
@@ -60,7 +64,11 @@ export class SistemaDataService {
           nombre_comercial,
           cod_actividad: actividad_economica.codigo,
           desc_actividad: actividad_economica.nombre,
-          ambiente: ambientefacturacion
+          ambiente: ambientefacturacion,
+          cod_estable_MH,
+          cod_estable,
+          cod_punto_venta_MH,
+          cod_punto_venta,
         },
       });
       return "Registro actualizado con exito";

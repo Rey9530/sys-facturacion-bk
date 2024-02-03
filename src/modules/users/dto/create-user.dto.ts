@@ -37,6 +37,11 @@ export class CreateUserDto {
     @IsPositive()
     id_sucursal: number;
 
+    @ApiProperty({})
+    @IsInt()
+    @IsPositive()
+    id_tipo_documento: number;
+
     @ApiProperty({}) 
     @IsOptional()
     id_sucursal_reser: number;
