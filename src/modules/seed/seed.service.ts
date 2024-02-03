@@ -27,17 +27,17 @@ export class SeedService {
       await this.deleteSeed();
       await this.prisma.facturasTipos.createMany({
         data: [
-          { nombre: "Factura", codigo: "01" },
-          { nombre: "Comprobante de crédito fiscal", codigo: "03" },
-          { nombre: "Nota de remisión", codigo: "04" },
-          { nombre: "Nota de crédito", codigo: "05" },
-          { nombre: "Nota de débito", codigo: "06" },
-          { nombre: "Comprobante de retención", codigo: "07" },
-          { nombre: "Comprobante de liquidación", codigo: "08" },
-          { nombre: "Documento contable de liquidación", codigo: "09" },
-          { nombre: "Facturas de exportación", codigo: "11" },
-          { nombre: "Factura de sujeto excluido", codigo: "14" },
-          { nombre: "Comprobante de donación ", codigo: "15" },
+          { version: 1, nombre: "Factura", codigo: "01" },
+          { version: 3, nombre: "Comprobante de crédito fiscal", codigo: "03" },
+          { version: 3, nombre: "Nota de remisión", codigo: "04" },
+          { version: 3, nombre: "Nota de crédito", codigo: "05" },
+          { version: 3, nombre: "Nota de crédito", codigo: "06" },
+          { version: 1, nombre: "Comprobante de retención", codigo: "07" },
+          { version: 1, nombre: "Comprobante de liquidación", codigo: "08" },
+          { version: 1, nombre: "Documento contable de liquidación", codigo: "09" },
+          { version: 1, nombre: "Facturas de exportación", codigo: "11" },
+          { version: 1, nombre: "Factura de sujeto excluido", codigo: "14" },
+          { version: 1, nombre: "Comprobante de donación ", codigo: "15" },
         ],
       });
       await this.prisma.dTETipoEstablecimiento.createMany({

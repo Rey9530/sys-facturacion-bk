@@ -195,6 +195,7 @@ model FacturasTipos {
   id_tipo_factura Int               @id @default(autoincrement())
   nombre          String
   codigo          String?
+  version         Int?
   estado          Estado            @default(ACTIVO)
   Bloques         FacturasBloques[]
   Compras         Compras[]

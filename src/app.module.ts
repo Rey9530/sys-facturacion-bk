@@ -23,6 +23,7 @@ import { ProveedoresModule } from './modules/inventario/proveedores/proveedores.
 import { ClienteModule } from './modules/facturacion/cliente/cliente.module';
 import { FacturaModule } from './modules/facturacion/factura/factura.module';
 import { ElectronicaModule } from './modules/facturacion/electronica/electronica.module';
+import { SendEmailsModule } from './modules/send-emails/send-emails.module';
 
 @Module({
   imports: [
@@ -48,7 +49,8 @@ import { ElectronicaModule } from './modules/facturacion/electronica/electronica
     ProveedoresModule,
     ClienteModule,
     FacturaModule,
-    ElectronicaModule
+    ElectronicaModule,
+    SendEmailsModule
   ],
   controllers: [],
   providers: [],
