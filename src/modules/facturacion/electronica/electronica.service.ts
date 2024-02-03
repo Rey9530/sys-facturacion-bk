@@ -85,6 +85,7 @@ export class ElectronicaService {
       "version": 2,
       "documento": token
     }
+    console.log(data_)
     let path_ = `${this.configService.get('API_FACTURACION')}fesv/anulardte`;
     var jwt = await this.validarToken();
     const config: AxiosRequestConfig = {
@@ -270,6 +271,7 @@ export class ElectronicaService {
       "passwordPri": dataSistem.private_key,
       "dteJson": data
     }
+    console.log(datos)
     let path_ = `${this.configService.get('API_FIRMA')}firmardocumento/`;
     const config: AxiosRequestConfig = {
       method: 'post', // Especifica el método HTTP
@@ -363,6 +365,7 @@ export class ElectronicaService {
       "codigoGeneracion": "2",
       "documento": token
     }
+    console.log(data)
     let path_ = `${this.configService.get('API_FACTURACION')}fesv/recepciondte`;
     var jwt = await this.validarToken();
     const config: AxiosRequestConfig = {
