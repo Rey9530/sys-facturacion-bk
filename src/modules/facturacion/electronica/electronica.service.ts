@@ -98,6 +98,7 @@ export class ElectronicaService {
       data: data_, // Los datos que se enviarán en el cuerpo de la solicitud
     };
     try {
+      console.log(path_)
       const respuesta: AxiosResponse = await axios.request(config);
       console.log(respuesta.data)
       console.log(respuesta.status)
@@ -282,6 +283,7 @@ export class ElectronicaService {
       data: datos, // Los datos que se enviarán en el cuerpo de la solicitud
     };
     try {
+      console.log(path_)
       const respuesta: AxiosResponse = await axios.request(config);
       console.log(respuesta.data)
       console.log(respuesta.status)
@@ -318,6 +320,7 @@ export class ElectronicaService {
       }, // Los datos que se enviarán en el cuerpo de la solicitud
     };
     try {
+      console.log(path_)
       const respuesta: AxiosResponse = await axios.request(config);
       console.log(respuesta.data)
       console.log(respuesta.status)
@@ -378,7 +381,11 @@ export class ElectronicaService {
       data, // Los datos que se enviarán en el cuerpo de la solicitud
     };
     try {
+      console.log(path_)
       const respuesta: AxiosResponse = await axios.request(config);
+      console.log(respuesta.data)
+      console.log(respuesta.status)
+      console.log(respuesta.data.observaciones)
       if (respuesta.status == 200) {
         await this.prisma.facturas.update({
           where: { id_factura: factura.id_factura },
@@ -396,9 +403,6 @@ export class ElectronicaService {
         }
 
       }
-      console.log(respuesta.data)
-      console.log(respuesta.status)
-      console.log(respuesta.data.observaciones)
       return null;
     } catch (error) {
       let msjError = '';
