@@ -98,6 +98,9 @@ export class ElectronicaService {
     };
     try {
       const respuesta: AxiosResponse = await axios.request(config);
+      console.log(respuesta.data)
+      console.log(respuesta.status)
+      console.log(respuesta.data.observaciones)
       if (respuesta.status == 200) {
         await this.prisma.facturas.update({
           where: { id_factura: factura.id_factura },
@@ -108,13 +111,21 @@ export class ElectronicaService {
       }
       return null;
     } catch (error) {
+      console.log(error.response); // Mensaje de error
       let msjError = '';
-      if (error.response.data.observaciones != null && Array.isArray(error.response.data.observaciones)) {
-        for (let index = 0; index < error.response.data.observaciones.length; index++) {
+      if (
+        error.response.data.observaciones != null &&
+        Array.isArray(error.response.data.observaciones)
+      ) {
+        for (
+          let index = 0;
+          index < error.response.data.observaciones.length;
+          index++
+        ) {
           const element = error.response.data.observaciones[index];
           msjError += element + '<br>&nbsp;<br>';
         }
-        if (error.response.data.descripcionMsg != "RECIBIDO") {
+        if (error.response.data.descripcionMsg != 'RECIBIDO') {
           msjError += error.response.data.descripcionMsg + '<br>&nbsp;<br>';
         }
       }
@@ -268,8 +279,16 @@ export class ElectronicaService {
       },
       data: datos, // Los datos que se enviarán en el cuerpo de la solicitud
     };
-    const respuesta: AxiosResponse = await axios.request(config);
-    return respuesta.data.body;
+    try {
+      const respuesta: AxiosResponse = await axios.request(config);
+      console.log(respuesta.data)
+      console.log(respuesta.status)
+      console.log(respuesta.data.observaciones)
+      return respuesta.data.body;
+    } catch (error) {
+      console.log(error.response)
+      return null;
+    }
   }
 
 
@@ -298,6 +317,9 @@ export class ElectronicaService {
     };
     try {
       const respuesta: AxiosResponse = await axios.request(config);
+      console.log(respuesta.data)
+      console.log(respuesta.status)
+      console.log(respuesta.data.observaciones)
       if (respuesta.status == 200) {
         let token_api_fac = respuesta.data.body.token.replace("Bearer ", "");
         await this.prisma.generalData.update({
