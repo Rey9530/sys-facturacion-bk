@@ -96,6 +96,15 @@ export class FacturaService {
       throw new InternalServerErrorException(error);
     }
     let db_detalle = [];
+    let descuNoSuj = 0;
+    let descuExenta = 0;
+    let descuGravada = 0;
+
+    let totalNoSuj = 0;
+    let totalExenta = 0;
+    let totalGravada = 0;
+    let totalNoGravado = 0;
+    iva = 0;
     for (let index = 0; index < detalle_factura.length; index++) {
       const detalle: any = detalle_factura[index];
       if (
@@ -122,9 +131,24 @@ export class FacturaService {
           .toString()
           .padStart(6, '0');
         await this.descargarItemDeInventario(detalle, no_fact);
+
+        let venta_grabada = detalle.tipo == "GRABADO" ? detalle.total : 0;
+        let venta_nosujeto = detalle.tipo == "NOSUJETO" ? detalle.total : 0;
+        let venta_exenta = detalle.tipo == "EXENTA" ? detalle.total : 0;
+
+        descuNoSuj = descuNoSuj + (detalle.tipo == "GRABADO" ? detalle.descuento : 0);
+        descuExenta = descuExenta + (detalle.tipo == "NOSUJETO" ? detalle.descuento : 0);
+        descuGravada = descuGravada + (detalle.tipo == "EXENTA" ? detalle.descuento : 0);
+
+        totalNoSuj = totalNoSuj + (detalle.tipo == "NOSUJETO" ? detalle.total : 0);
+        totalExenta = totalExenta + (detalle.tipo == "EXENTA" ? detalle.total : 0);
+        totalGravada = totalGravada + (detalle.tipo == "GRABADO" ? detalle.total : 0);
+        iva = iva + (detalle.tipo == "GRABADO" ? detalle.iva : 0);
         db_detalle.push({
+          tipo_detalle: detalle.tipo,
           id_factura: 0,
           id_catalogo: detalle.id_catalogo,
+          precio_unitario: detalle.precio_unitario,
           codigo: detalle.codigo,
           nombre: detalle.nombre,
           precio_sin_iva: detalle.precio_sin_iva,
@@ -136,8 +160,11 @@ export class FacturaService {
             (detalle.id_descuento != null && detalle.id_descuento) > 0
               ? detalle.id_descuento
               : null,
-          iva: detalle.iva,
+          iva: detalle.tipo == "GRABADO" ? detalle.iva : 0,
           total: detalle.total,
+          venta_grabada,
+          venta_nosujeto,
+          venta_exenta,
         });
       }
     }
@@ -146,6 +173,10 @@ export class FacturaService {
         'El detalle de la factura esta incorrecto',
       );
     }
+    iva = Number(iva.toFixed(2));
+    total = Number(total.toFixed(2));
+    descuento = 0;
+    totalNoGravado = totalNoSuj + totalExenta;
     const bloque = tipoFactura?.Bloques[0];
     const id_bloque = tipoFactura?.Bloques[0].id_bloque;
     const numero_factura = bloque?.actual.toString().padStart(10, '0');
@@ -175,6 +206,13 @@ export class FacturaService {
         iva_percivido,
         total,
         id_usuario,
+        descuNoSuj,
+        descuExenta,
+        descuGravada,
+        totalNoSuj,
+        totalExenta,
+        totalGravada,
+        totalNoGravado,
       },
     });
     if (factura == null) {
@@ -182,10 +220,12 @@ export class FacturaService {
       throw new InternalServerErrorException('Error inesperado reviosar log');
     }
     try {
+      console.log("Llegamos qui");
       db_detalle = db_detalle.map((e) => {
         e.id_factura = factura.id_factura;
         return e;
       });
+      console.log("Llegamos qui222");
       //TODO: hacer la verificasion por si el numero actual ya se paso el limite del campo hasta
       await this.prisma.facturasBloques.update({
         data: { actual: bloque!.actual + 1 },
@@ -194,6 +234,7 @@ export class FacturaService {
       await this.prisma.facturasDetalle.createMany({
         data: db_detalle,
       });
+      console.log("Llegamos qui33");
       const facturaCreada = await this.prisma.facturas.findUnique({
         where: { id_factura: factura.id_factura },
         include: {
@@ -214,7 +255,10 @@ export class FacturaService {
           }
         },
       });
+      console.log("Llegamos qui444");
       this.serviceDTE.generarFacturaElectronica(facturaCreada);
+
+      console.log("Llegamos qui555");
       return facturaCreada;
     } catch (error) {
       console.log(error);
@@ -568,7 +612,7 @@ export class FacturaService {
         },
       });
 
-      var kardex = await this.prisma.kardex.findFirst({
+      var kardex: any = await this.prisma.kardex.findFirst({
         where: {
           id_catalogo: item.id_catalogo,
         },

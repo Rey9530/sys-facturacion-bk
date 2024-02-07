@@ -149,20 +149,19 @@ export class ElectronicaService {
         "tipoItem": 2,
         "numeroDocumento": null,
         "cantidad": element.cantidad,
-        "codigo": null,
+        "codigo": element.codigo,
         "codTributo": null,
         "uniMedida": 99,
         "descripcion": element.nombre,
-        "precioUni": element.precio_con_iva,
-        "montoDescu": 0,
-        "ventaNoSuj": 0,
-        "ventaExenta": 0,
-        "ventaGravada": element.subtotal,
+        "precioUni": element.precio_unitario,
+        "montoDescu": element.descuento,
+        "ventaNoSuj": element.venta_nosujeto,
+        "ventaExenta": element.venta_exenta,
+        "ventaGravada": element.venta_grabada,
         "tributos": null,
         "psv": 0,
         "noGravado": 0,
-        "ivaItem": element.iva
-
+        "ivaItem": element.iva ?? 0
       });
     }
     let data = {
@@ -196,10 +195,10 @@ export class ElectronicaService {
           "complemento": factura.Sucursal.complemento
         },
         "telefono": dataSistem.contactos,
-        "codPuntoVentaMH": null,
-        "codPuntoVenta": null,
-        "codEstableMH": null,
-        "codEstable": null,
+        "codPuntoVentaMH": dataSistem.cod_punto_venta_MH != null && dataSistem.cod_punto_venta_MH.length > 0 ? dataSistem.cod_punto_venta_MH : null,
+        "codPuntoVenta": dataSistem.cod_punto_venta != null && dataSistem.cod_punto_venta.length > 0 ? dataSistem.cod_punto_venta : null,
+        "codEstableMH": dataSistem.cod_estable_MH != null && dataSistem.cod_estable_MH.length > 0 ? dataSistem.cod_estable_MH : null,
+        "codEstable": dataSistem.cod_estable != null && dataSistem.cod_estable.length > 0 ? dataSistem.cod_estable : null,
         "correo": dataSistem.correo
       },
       "receptor": {
@@ -223,23 +222,23 @@ export class ElectronicaService {
         ...detalle
       ],
       "resumen": {
-        "totalNoSuj": 0,
-        "totalExenta": 0,
-        "totalGravada": factura.total,
-        "subTotalVentas": factura.total,
-        "descuNoSuj": 0,
-        "descuExenta": 0,
-        "descuGravada": 0,
+        "totalNoSuj": factura.totalNoSuj,
+        "totalExenta": factura.totalExenta,
+        "totalGravada": factura.totalGravada,
+        "totalNoGravado": 0,
+        "subTotalVentas": factura.subtotal,
+        "descuNoSuj": factura.descuNoSuj,
+        "descuExenta": factura.descuExenta,
+        "descuGravada": factura.descuGravada,
         "porcentajeDescuento": 0,
-        "totalDescu": 0,
+        "totalDescu": factura.descuento,
         "tributos": null,
         "subTotal": factura.total,
-        "ivaRete1": 0,
+        "ivaRete1": factura.iva_retenido,
         "reteRenta": 0,
         "montoTotalOperacion": factura.total,
-        "totalNoGravado": 0,
         "totalPagar": factura.total,
-        "totalLetras": convertirCantidadADolaresYCentavos(factura.total.toString()),
+        "totalLetras": convertirCantidadADolaresYCentavos(Number(factura.total.toFixed(2)).toString()).toUpperCase(),
         "totalIva": factura.iva,
         "saldoFavor": 0,
         "condicionOperacion": 1,
@@ -442,19 +441,20 @@ export class ElectronicaService {
         "tipoItem": 2,
         "numeroDocumento": null,
         "cantidad": element.cantidad,
-        "codigo": null,
+        "codigo": element.codigo,
         "codTributo": null,
         "uniMedida": 99,
         "descripcion": element.nombre,
-        "precioUni": element.precio_con_iva,
-        "montoDescu": 0,
-        "ventaNoSuj": 0,
-        "ventaExenta": 0,
-        "ventaGravada": element.total + element.iva,
-        "tributos": null,
+        "precioUni": element.precio_unitario,
+        "montoDescu": element.descuento,
+        "ventaNoSuj": element.venta_nosujeto,
+        "ventaExenta": element.venta_exenta,
+        "ventaGravada": element.venta_grabada,
+        "tributos": element.tipo_detalle == "GRABADO" ? [
+          "20"
+        ] : null,
         "psv": 0,
         "noGravado": 0,
-        // "ivaItem": element.iva  
       });
     }
     let data = {
@@ -515,24 +515,30 @@ export class ElectronicaService {
         ...detalle
       ],
       "resumen": {
-        "totalNoSuj": 0,
-        "totalExenta": 0,
-        "totalGravada": factura.total,
-        "subTotalVentas": factura.total,
-        "descuNoSuj": 0,
-        "descuExenta": 0,
-        "descuGravada": 0,
+        "totalNoSuj": factura.totalNoSuj,
+        "totalExenta": factura.totalExenta,
+        "totalGravada": factura.totalGravada,
+        "subTotalVentas": factura.subtotal,
+        "descuNoSuj": factura.descuNoSuj,
+        "descuExenta": factura.descuExenta,
+        "descuGravada": factura.descuGravada,
         "porcentajeDescuento": 0,
         "totalDescu": 0,
-        "tributos": null,
-        "subTotal": factura.total,
+        "tributos": [
+          {
+            "codigo": "20",
+            "descripcion": "Impuesto al Valor Agregado 13%",
+            "valor": factura.iva
+          }
+        ],
+        "subTotal": factura.subtotal,
         "ivaPerci1": 0,
-        "ivaRete1": 0,
+        "ivaRete1": factura.iva_retenido,
         "reteRenta": 0,
         "montoTotalOperacion": factura.total,
         "totalNoGravado": 0,
         "totalPagar": factura.total,
-        "totalLetras": convertirCantidadADolaresYCentavos(factura.total.toString()),
+        "totalLetras": convertirCantidadADolaresYCentavos(Number(factura.total.toFixed(2)).toString()).toUpperCase(),
         "saldoFavor": 0,
         "condicionOperacion": 1,
         "pagos": null,
@@ -543,7 +549,7 @@ export class ElectronicaService {
         "docuEntrega": null,
         "nombRecibe": null,
         "docuRecibe": null,
-        "observaciones": `TOTAL TRANSACCION ES POR $ ${factura.total}`,
+        "observaciones": `TOTAL TRANSACCION ES POR $ ${Number(factura.total.toFixed(2))}`,
         "placaVehiculo": null
       },
       "apendice": null

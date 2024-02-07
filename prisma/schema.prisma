@@ -33,7 +33,7 @@ model Usuarios {
   nombres                        String
   apellidos                      String
   dui                            String?
-  foto                           String?                         @unique
+  foto                           String?
   estado                         Estado                          @default(ACTIVO)
   fecha_creacion                 DateTime                        @default(now()) @db.Timestamptz()
   id_rol                         Int
@@ -224,6 +224,12 @@ model DTETipoInvalidacion {
   estado               Estado @default(ACTIVO)
 }
 
+model DTETipoContingencia {
+  id_tipo_contingencia Int    @id @default(autoincrement())
+  nombre               String
+  estado               Estado @default(ACTIVO)
+}
+
 model DTETipoDocumentoIdentificacion {
   id_tipo_documento Int        @id @default(autoincrement())
   nombre            String
@@ -231,6 +237,138 @@ model DTETipoDocumentoIdentificacion {
   estado            Estado     @default(ACTIVO)
   Cliente           Cliente[]
   Usuarios          Usuarios[]
+}
+
+model DTERetencionIvaMh {
+  id_dte_retencion_iva_mh Int    @id @default(autoincrement())
+  codigo                  String
+  valor                   String
+}
+
+model DTETipoGeneracionDocumento {
+  id_dte_tipo_generacion_documento Int    @id @default(autoincrement())
+  codigo                           Int
+  valor                            String
+}
+
+model DTETipoServicioMedico {
+  id_dte_tipo_servicio_medico Int    @id @default(autoincrement())
+  codigo                      Int
+  valor                       String
+}
+
+model DTETipoItem {
+  id_dte_tipo_item Int    @id @default(autoincrement())
+  codigo           Int
+  valor            String
+}
+
+model DTEUnidadDeMedida {
+  id_unidad_de_medida Int    @id @default(autoincrement())
+  codigo              String
+  valor               String
+}
+
+model DTETributosAplicadosPorItem {
+  id_tributos_aplicados_por_item Int    @id @default(autoincrement())
+  codigo                         String
+  valor                          String
+}
+
+model DTETributosAplicadosPorItemCuerpo {
+  id_tributos_aplicados_por_item_cuerpo Int    @id @default(autoincrement())
+  codigo                                String
+  valor                                 String
+}
+
+model DTEImpuestosAdValoremAplicadosPorItem {
+  id_impuestos_ad_valorem_aplicados_por_item Int    @id @default(autoincrement())
+  codigo                                     String
+  valor                                      String
+}
+
+model DTECondicionDeLaOperacion {
+  id_condicion_de_la_operacion Int    @id @default(autoincrement())
+  codigo                       Int
+  valor                        String
+}
+
+model DTEPlazo {
+  id_plazo Int    @id @default(autoincrement())
+  codigo   String
+  valor    String
+}
+
+model DTEFormaPago {
+  id     Int    @id @default(autoincrement())
+  codigo String
+  valor  String
+}
+
+model DTEPais {
+  id_pais Int    @id @default(autoincrement())
+  codigo  String
+  valor   String
+}
+
+model DTEOtrosDocumentosAsociados {
+  id_otros_documentos_asociados Int    @id @default(autoincrement())
+  codigo                        Int
+  valor                         String
+}
+
+model DTETiposDeDocumentosEnContingencia {
+  id_tipos_de_documentos_en_contingencia Int    @id @default(autoincrement())
+  codigo                                 String
+  valor                                  String
+}
+
+model DTETituloAQueSeRemiteLosBienes {
+  id_titulo_a_que_se_remite_los_bienes Int    @id @default(autoincrement())
+  codigo                               String
+  valor                                String
+}
+
+model DTECategoriaDeBienYServicio {
+  id_categoria Int    @id @default(autoincrement())
+  codigo       Int
+  valor        String
+}
+
+model DTERecintoFiscal {
+  id_recinto_fiscal Int    @id @default(autoincrement())
+  codigo            String
+  valor             String
+}
+
+model DTERegimen {
+  id_regimen Int    @id @default(autoincrement())
+  codigo     String
+  valor      String
+}
+
+model DTETipoDePersona {
+  id_tipoDePersona Int    @id @default(autoincrement())
+  codigo           Int
+  valor            String
+}
+
+model DTETransporte {
+  id_transporte Int    @id @default(autoincrement())
+  codigo        Int
+  valor         String
+}
+
+model DTEIncoterms {
+  id_incoterms Int    @id @default(autoincrement())
+  codigo       String
+  valor        String
+}
+
+model DTEDomicilioFiscal {
+  id_domicilioFiscal Int    @id @default(autoincrement())
+  codigo             Int
+  valor              String
 }
 
 model FacturasMetodosDePago {
@@ -364,9 +502,16 @@ model Facturas {
   credito                   Float?                @default(0)
   subtotal                  Float?                @default(0)
   descuento                 Float?                @default(0)
+  descuNoSuj                Float?                @default(0)
+  descuExenta               Float?                @default(0)
+  descuGravada              Float?                @default(0)
   iva                       Float?                @default(0)
   iva_retenido              Float?                @default(0)
   iva_percivido             Float?                @default(0)
+  totalNoSuj                Float?                @default(0)
+  totalExenta               Float?                @default(0)
+  totalGravada              Float?                @default(0)
+  totalNoGravado            Float?                @default(0)
   total                     Float?                @default(0)
   clase                     Int?                  @default(1) // 1==Imprenta o tikets, 2==Formulario unico, 4==Factura electronica(dte)
   dte_json                  String?               @db.Text
@@ -390,28 +535,39 @@ model Facturas {
 }
 
 model FacturasDetalle {
-  id_factura_detalle Int                 @id @default(autoincrement())
+  id_factura_detalle Int                      @id @default(autoincrement())
   id_factura         Int
-  Factura            Facturas            @relation(fields: [id_factura], references: [id_factura], onDelete: NoAction, onUpdate: NoAction, map: "fk_fatura_detalle")
-  id_catalogo        Int                 @default(0)
-  Catalogo           Catalogo            @relation(fields: [id_catalogo], references: [id_catalogo], onDelete: NoAction, onUpdate: NoAction, map: "fk_factura_detalle_catalogo")
-  codigo             String?             @db.Text
+  Factura            Facturas                 @relation(fields: [id_factura], references: [id_factura], onDelete: NoAction, onUpdate: NoAction, map: "fk_fatura_detalle")
+  id_catalogo        Int                      @default(0)
+  Catalogo           Catalogo                 @relation(fields: [id_catalogo], references: [id_catalogo], onDelete: NoAction, onUpdate: NoAction, map: "fk_factura_detalle_catalogo")
+  codigo             String?                  @db.Text
   nombre             String
-  descripcion        String?             @db.Text
-  precio_sin_iva     Float?              @default(0)
-  precio_con_iva     Float?              @default(0)
-  cantidad           Float               @default(0)
-  subtotal           Float?              @default(0)
-  descuento          Float?              @default(0)
-  iva                Float?              @default(0)
-  total              Float?              @default(0)
-  fecha_creacion     DateTime            @default(now())
-  id_descuento       Int?                @default(0)
-  Descuento          FacturasDescuentos? @relation(fields: [id_descuento], references: [id_descuento], onDelete: NoAction, onUpdate: NoAction, map: "fk_fatura_detalle_descuento")
+  descripcion        String?                  @db.Text
+  precio_unitario    Float?                   @default(0)
+  precio_sin_iva     Float?                   @default(0)
+  precio_con_iva     Float?                   @default(0)
+  cantidad           Float                    @default(0)
+  venta_grabada      Float?                   @default(0)
+  venta_nosujeto     Float?                   @default(0)
+  venta_exenta       Float?                   @default(0)
+  subtotal           Float?                   @default(0)
+  descuento          Float?                   @default(0)
+  iva                Float?                   @default(0)
+  total              Float?                   @default(0)
+  fecha_creacion     DateTime                 @default(now())
+  id_descuento       Int?                     @default(0)
+  Descuento          FacturasDescuentos?      @relation(fields: [id_descuento], references: [id_descuento], onDelete: NoAction, onUpdate: NoAction, map: "fk_fatura_detalle_descuento")
+  tipo_detalle       MovimientoDetalleFactura @default(GRABADO)
 
   @@index([id_descuento], name: "fk_fatura_detalle_descuento_id")
   @@index([id_factura], name: "fk_fatura_detalle_id")
   @@index([id_catalogo], name: "fk_factura_detalle_catalogo_id")
+}
+
+enum MovimientoDetalleFactura {
+  GRABADO
+  EXENTA
+  NOSUJETO
 }
 
 // ======================================================   Estrutura de INVENTARIO 

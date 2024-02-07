@@ -20,4 +20,8 @@ export class CreateSucursaleDto {
     @ApiProperty({})
     @IsPositive()
     id_tipo_establecimiento: number;
+    @ApiProperty({})
+    @IsString()
+    @MinLength(4)
+    complemento: string; 
 }

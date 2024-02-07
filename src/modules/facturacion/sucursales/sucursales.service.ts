@@ -17,6 +17,7 @@ export class SucursalesService {
       nombre = "",
       color = "",
       telefono = "",
+      complemento = "",
       id_municipio = 0,
       id_tipo_establecimiento = 0,
     } = createSucursaleDto;
@@ -26,6 +27,7 @@ export class SucursalesService {
           nombre,
           id_municipio,
           telefono,
+          complemento,
           color,
           id_tipo_establecimiento
         },
@@ -81,6 +83,7 @@ export class SucursalesService {
         nombre = "",
         color = "",
         telefono = "",
+        complemento = "",
         id_municipio = 0,
         id_tipo_establecimiento = 0, } = updateSucursaleDto;
       const registroActualizado = await this.prisma.sucursales.update({
@@ -89,6 +92,7 @@ export class SucursalesService {
           nombre,
           id_municipio,
           telefono,
+          complemento,
           color,
           id_tipo_establecimiento
         },

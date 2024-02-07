@@ -21,7 +21,7 @@ export class SistemaDataService {
     }
   }
   async listadoActividadesEconomicas() {
-    return await this.prisma.dTEActividadEconomica.findMany({ where: { estado: 'ACTIVO' } });
+    return await this.prisma.dTEActividadEconomica.findMany({ where: { estado: 'ACTIVO' }, orderBy: { nombre: 'asc' } });
   }
 
   async update(uid: number, updateSistemaDatumDto: UpdateSistemaDatumDto) {
