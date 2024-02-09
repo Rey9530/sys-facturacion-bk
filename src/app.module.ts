@@ -24,6 +24,7 @@ import { ClienteModule } from './modules/facturacion/cliente/cliente.module';
 import { FacturaModule } from './modules/facturacion/factura/factura.module';
 import { ElectronicaModule } from './modules/facturacion/electronica/electronica.module';
 import { SendEmailsModule } from './modules/send-emails/send-emails.module';
+import { PdfDteModule } from './modules/facturacion/pdf-dte/pdf-dte.module';
 
 @Module({
   imports: [
@@ -50,7 +51,8 @@ import { SendEmailsModule } from './modules/send-emails/send-emails.module';
     ClienteModule,
     FacturaModule,
     ElectronicaModule,
-    SendEmailsModule
+    SendEmailsModule,
+    PdfDteModule
   ],
   controllers: [],
   providers: [],
