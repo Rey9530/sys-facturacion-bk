@@ -136,9 +136,9 @@ export class FacturaService {
         let venta_nosujeto = detalle.tipo == "NOSUJETO" ? detalle.total : 0;
         let venta_exenta = detalle.tipo == "EXENTA" ? detalle.total : 0;
 
-        descuNoSuj = descuNoSuj + (detalle.tipo == "GRABADO" ? detalle.descuento : 0);
-        descuExenta = descuExenta + (detalle.tipo == "NOSUJETO" ? detalle.descuento : 0);
-        descuGravada = descuGravada + (detalle.tipo == "EXENTA" ? detalle.descuento : 0);
+        // descuNoSuj = descuNoSuj + (detalle.tipo == "NOSUJETO" ? detalle.descuento : 0);
+        // descuExenta = descuExenta + (detalle.tipo == "EXENTA" ? detalle.descuento : 0);
+        // descuGravada = descuGravada + (detalle.tipo == "GRABADO" ? detalle.descuento : 0);
 
         totalNoSuj = totalNoSuj + (detalle.tipo == "NOSUJETO" ? detalle.total : 0);
         totalExenta = totalExenta + (detalle.tipo == "EXENTA" ? detalle.total : 0);

@@ -56,7 +56,7 @@ export class SeedService {
           { nombre: "Otro", codigo: "3" },
         ],
       });
- 
+
 
       await this.prisma.dTERetencionIvaMh.createMany({
         data: [
@@ -147,20 +147,20 @@ export class SeedService {
       });
       await this.prisma.departamentos.createMany({
         data: [
-          { id_departamento: 1,  codigo:"01", nombre: "Ahuachapán", codigo_iso: "SV-AH" },
-          { id_departamento: 2,  codigo:"02", nombre: "Santa Ana", codigo_iso: "SV-SA" },
-          { id_departamento: 3,  codigo:"03", nombre: "Sonsonate", codigo_iso: "SV-SO" },
-          { id_departamento: 4,  codigo:"04", nombre: "Chalatenango", codigo_iso: "SV-CH" },
-          { id_departamento: 5,  codigo:"05", nombre: "La Libertad", codigo_iso: "SV-LI" },
-          { id_departamento: 6,  codigo:"06", nombre: "San Salvador", codigo_iso: "SV-SS" },
-          { id_departamento: 7,  codigo:"07", nombre: "Cuscatlán", codigo_iso: "SV-CU" },
-          { id_departamento: 8,  codigo:"08", nombre: "La Paz", codigo_iso: "SV-PA" },
-          { id_departamento: 9,  codigo:"09", nombre: "Cabañas", codigo_iso: "SV-CA" },
-          { id_departamento: 10,  codigo:"10", nombre: "San Vicente", codigo_iso: "SV-SV" },
-          { id_departamento: 11,  codigo:"11", nombre: "Usulután", codigo_iso: "SV-US" },
-          { id_departamento: 13,  codigo:"13", nombre: "San Miguel", codigo_iso: "SV-SM" },
-          { id_departamento: 12,  codigo:"12", nombre: "Morazán", codigo_iso: "SV-MO" },
-          { id_departamento: 14,  codigo:"14", nombre: "La Unión", codigo_iso: "SV-UN" },
+          { id_departamento: 1, codigo: "01", nombre: "Ahuachapán", codigo_iso: "SV-AH" },
+          { id_departamento: 2, codigo: "02", nombre: "Santa Ana", codigo_iso: "SV-SA" },
+          { id_departamento: 3, codigo: "03", nombre: "Sonsonate", codigo_iso: "SV-SO" },
+          { id_departamento: 4, codigo: "04", nombre: "Chalatenango", codigo_iso: "SV-CH" },
+          { id_departamento: 5, codigo: "05", nombre: "La Libertad", codigo_iso: "SV-LI" },
+          { id_departamento: 6, codigo: "06", nombre: "San Salvador", codigo_iso: "SV-SS" },
+          { id_departamento: 7, codigo: "07", nombre: "Cuscatlán", codigo_iso: "SV-CU" },
+          { id_departamento: 8, codigo: "08", nombre: "La Paz", codigo_iso: "SV-PA" },
+          { id_departamento: 9, codigo: "09", nombre: "Cabañas", codigo_iso: "SV-CA" },
+          { id_departamento: 10, codigo: "10", nombre: "San Vicente", codigo_iso: "SV-SV" },
+          { id_departamento: 11, codigo: "11", nombre: "Usulután", codigo_iso: "SV-US" },
+          { id_departamento: 13, codigo: "13", nombre: "San Miguel", codigo_iso: "SV-SM" },
+          { id_departamento: 12, codigo: "12", nombre: "Morazán", codigo_iso: "SV-MO" },
+          { id_departamento: 14, codigo: "14", nombre: "La Unión", codigo_iso: "SV-UN" },
         ],
       });
 
@@ -1891,6 +1891,8 @@ export class SeedService {
           nit: "123456789",
           nrc: "1234",
           contactos: "234567890",
+          sender_email: 'invoices@relex-dev.com',
+          token_email: 'b0cde8a032cc5cbc6341033c9d33082b'
         },
       });
 

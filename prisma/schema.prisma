@@ -74,6 +74,9 @@ model GeneralData {
   public_key            String?       @default("")
   private_key           String?       @default("")
   token_api_fac         String?       @default("")
+  token_email           String?       @default("")
+  sender_email          String?       @default("")
+  domain_email          String?       @default("")
   impuesto              Float?        @default(0.13)
   id_tipo_contribuyente Int?
   TipoCliente           TiposCliente? @relation(fields: [id_tipo_contribuyente], references: [id_tipo_cliente], onDelete: NoAction, onUpdate: NoAction, map: "fk_sistema_tipo")

@@ -1,5 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { Attachment, MailtrapClient } from 'mailtrap';
+import { PdfDteService } from '../facturacion/pdf-dte/pdf-dte.service';
+import { PrismaService } from 'src/common/services';
 // import { ConfigService } from '@nestjs/config';
 // import { promises as fs } from 'fs';
 
@@ -8,23 +10,31 @@ import { Attachment, MailtrapClient } from 'mailtrap';
 @Injectable()
 export class SendEmailsService {
 
-    constructor() { }
+    constructor(
+        private readonly pdfDteService: PdfDteService,
+        private readonly prismaService: PrismaService,
+    ) { }
 
-    async sendEmailInvoice(to, json, from, nameJson) { 
-        const TOKEN = "b0cde8a032cc5cbc6341033c9d33082b";
-        const SENDER_EMAIL = "<invoices@relex-dev.com>";
+    async sendEmailInvoice(to, json, from, nameJson, id_factura) {
+        const data = await this.prismaService.generalData.findFirstOrThrow();
+        if (!data) throw new InternalServerErrorException('No se encontraron datos generales');
+        const TOKEN = data.token_email;//"";
+        const SENDER_EMAIL = "<" + data.sender_email + ">";//invoices@relex-dev.com
         const RECIPIENT_EMAIL = "<" + to + ">";
 
         const client = new MailtrapClient({ token: TOKEN });
-        const sender = { name: from, email: SENDER_EMAIL };
+        const sender = { name: data.sender_email, email: SENDER_EMAIL };
         const contenidoBase64 = Buffer.from(json).toString('base64');
-
-        // Convertir el contenido del archivo a base64 
+        const pdfBase64 = await this.pdfDteService.generatePdfFactura(id_factura); 
         let array: Attachment[] = [
             {
-                filename: nameJson,
+                filename: nameJson + '.json',
                 type: "application/json",
                 content: contenidoBase64,
+            }, {
+                filename: nameJson + '.pdf',
+                type: "application/pdf",
+                content: pdfBase64,
             }
         ]
         client

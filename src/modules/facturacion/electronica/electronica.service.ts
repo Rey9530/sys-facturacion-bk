@@ -7,7 +7,7 @@ import { v5 as uuidv5, v4 as uuidv4 } from 'uuid';
 import { format } from 'date-fns';
 import * as jwt from 'jsonwebtoken';
 import { SendEmailsService } from 'src/modules/send-emails/send-emails.service';
-import { convertirCantidadADolaresYCentavos, verifyEmail } from 'src/common/helpers';
+import { convertirCantidadADolaresYCentavos, eliminarGuionesYEspacios, verifyEmail } from 'src/common/helpers';
 
 @Injectable()
 export class ElectronicaService {
@@ -182,8 +182,8 @@ export class ElectronicaService {
       "documentoRelacionado": null,
       "otrosDocumentos": null,
       "emisor": {
-        "nit": dataSistem.nit,
-        "nrc": dataSistem.nrc,
+        "nit": eliminarGuionesYEspacios(dataSistem.nit),
+        "nrc": eliminarGuionesYEspacios(dataSistem.nrc),
         "nombre": dataSistem.nombre_sistema,
         "codActividad": dataSistem.cod_actividad,
         "descActividad": dataSistem.desc_actividad,
@@ -203,8 +203,8 @@ export class ElectronicaService {
       },
       "receptor": {
         "tipoDocumento": factura.Cliente.DTETipoDocumentoIdentificacion != null ? factura.Cliente.DTETipoDocumentoIdentificacion.codigo : null,
-        "numDocumento": (factura.Cliente.dui != null && factura.Cliente.dui.length > 0) ? factura.Cliente.dui : null,
-        "nrc": factura.Cliente.registro_nrc != null && factura.Cliente.registro_nrc != "" && factura.Cliente.registro_nrc != "N/A" ? factura.Cliente.registro_nrc : null,
+        "numDocumento": (factura.Cliente.dui != null && factura.Cliente.dui.length > 0) ? eliminarGuionesYEspacios(factura.Cliente.dui) : null,
+        "nrc": factura.Cliente.registro_nrc != null && factura.Cliente.registro_nrc != "" && factura.Cliente.registro_nrc != "N/A" ? eliminarGuionesYEspacios(factura.Cliente.registro_nrc) : null,
         "nombre": factura.Cliente.nombre,
         "codActividad": factura.Cliente.DTEActividadEconomica != null ? factura.Cliente.DTEActividadEconomica.codigo : null,
         "descActividad": factura.Cliente.DTEActividadEconomica != null ? factura.Cliente.DTEActividadEconomica.nombre : null,
@@ -398,7 +398,7 @@ export class ElectronicaService {
         jsonDte.firmaElectronica = token;
         jsonDte.selloRecibido = respuesta.data.selloRecibido;
         if (verifyEmail(factura_s.Cliente.correo ?? "") && factura_s.Cliente.correo.length > 0) {
-          this.serviceEmail.sendEmailInvoice(factura_s.Cliente.correo, JSON.stringify(jsonDte), dataSistem.correo, jsonDte.identificacion.numeroControl + '.json');
+          this.serviceEmail.sendEmailInvoice(factura_s.Cliente.correo, JSON.stringify(jsonDte), dataSistem.correo, jsonDte.identificacion.numeroControl,factura_s.id_factura);
         }
 
       }
@@ -475,8 +475,8 @@ export class ElectronicaService {
       "documentoRelacionado": null,
       "otrosDocumentos": null,
       "emisor": {
-        "nit": dataSistem.nit,
-        "nrc": dataSistem.nrc,
+        "nit": eliminarGuionesYEspacios(dataSistem.nit),
+        "nrc": eliminarGuionesYEspacios(dataSistem.nrc),
         "nombre": dataSistem.nombre_sistema,
         "codActividad": dataSistem.cod_actividad,
         "descActividad": dataSistem.desc_actividad,
@@ -496,8 +496,8 @@ export class ElectronicaService {
       },
       "receptor": {
         "nombreComercial": factura.Cliente.razon_social != null ? factura.Cliente.razon_social : null,
-        "nit": (factura.Cliente.dui != null && factura.Cliente.dui.length > 0) ? factura.Cliente.dui : null,
-        "nrc": factura.Cliente.registro_nrc != null && factura.Cliente.registro_nrc != "" && factura.Cliente.registro_nrc != "N/A" ? factura.Cliente.registro_nrc : null,
+        "nit": (factura.Cliente.dui != null && factura.Cliente.dui.length > 0) ? eliminarGuionesYEspacios(factura.Cliente.dui) : null,
+        "nrc": factura.Cliente.registro_nrc != null && factura.Cliente.registro_nrc != "" && factura.Cliente.registro_nrc != "N/A" ? eliminarGuionesYEspacios(factura.Cliente.registro_nrc) : null,
         "nombre": factura.Cliente.nombre,
         "codActividad": factura.Cliente.DTEActividadEconomica != null ? factura.Cliente.DTEActividadEconomica.codigo : null,
         "descActividad": factura.Cliente.DTEActividadEconomica != null ? factura.Cliente.DTEActividadEconomica.nombre : null,

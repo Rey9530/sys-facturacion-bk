@@ -31,9 +31,9 @@ Este sistema es para crear facturas que se sincronizan con las facturas electron
 ```bash
 $ yarn install
 
-$ docker-compose up -d
+$ docker-compose -f docker-compose.dev.yaml up -d
 
-$ npx prisma migrate dev --name init  
+$ npx prisma migrate dev
 ```
 
 ## Seeder
