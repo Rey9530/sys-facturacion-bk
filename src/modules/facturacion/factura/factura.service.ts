@@ -393,15 +393,14 @@ export class FacturaService {
     });
   }
   async obtenerListadoFacturas(query: FechasFacturaDto, user: Usuarios) {
-    var desde: any = query.desde!.toString();
-    var hasta: any = query.hasta!.toString();
-    let id_sucursal = Number(user.id_sucursal);
-
-    // fecha.setDate(fecha.getDate() + dias);
-    desde = new Date(desde);
-    hasta = new Date(hasta);
+    
+    var desde1: any = query.desde.toString().split("-");
+    var hasta1: any = query.hasta.toString().split("-");
+    var desde = new Date(desde1[0], desde1[1] - 1, desde1[2], 0, 0, 0);
+    var hasta = new Date(hasta1[0], hasta1[1] - 1, hasta1[2], 23, 59, 59);
     hasta.setDate(hasta.getDate() + 1);
-
+    
+    let id_sucursal = Number(user.id_sucursal);
     var total_facturado = 0;
     var total_facturas = 0;
     var total_consumidor_final = 0;
