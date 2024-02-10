@@ -36,6 +36,13 @@ $ docker-compose -f docker-compose.dev.yaml up -d
 $ npx prisma migrate dev
 ```
 
+
+## Configuraciones
+- Verificar que el publi key, private key, token_email, email_send y domain esten configurados en la tabal de generalData
+- En el sistema opcion de Configuracion->Facturacion->Sistema agregar los datos del contribuyente
+- Configurar los dotos del usuario en el menu usuario
+- Configurar los bloques de facturas 
+
 ## Seeder
 Posteriormente accede a [Documentacion](http://localhost:3000/api), y ejecutas el endpoint seed
 
