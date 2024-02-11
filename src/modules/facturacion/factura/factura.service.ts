@@ -13,6 +13,7 @@ import {
   FechasFacturaDto,
 } from './dto';
 import { ElectronicaService } from '../electronica/electronica.service';
+import { formatNumberDecimal } from 'src/common/helpers';
 
 @Injectable()
 export class FacturaService {
@@ -148,23 +149,23 @@ export class FacturaService {
           tipo_detalle: detalle.tipo,
           id_factura: 0,
           id_catalogo: detalle.id_catalogo,
-          precio_unitario: detalle.precio_unitario,
+          precio_unitario: formatNumberDecimal(detalle.precio_unitario),
           codigo: detalle.codigo,
           nombre: detalle.nombre,
-          precio_sin_iva: detalle.precio_sin_iva,
-          precio_con_iva: detalle.precio_con_iva,
+          precio_sin_iva: formatNumberDecimal(detalle.precio_sin_iva),
+          precio_con_iva: formatNumberDecimal(detalle.precio_con_iva),
           cantidad: detalle.cantidad,
-          subtotal: detalle.subtotal,
-          descuento: detalle.descuento,
+          subtotal: formatNumberDecimal(detalle.subtotal),
+          descuento: formatNumberDecimal(detalle.descuento),
           id_descuento:
             (detalle.id_descuento != null && detalle.id_descuento) > 0
               ? detalle.id_descuento
               : null,
-          iva: detalle.tipo == "GRABADO" ? detalle.iva : 0,
-          total: detalle.total,
-          venta_grabada,
-          venta_nosujeto,
-          venta_exenta,
+          iva: formatNumberDecimal(detalle.tipo == "GRABADO" ? detalle.iva : 0),
+          total: formatNumberDecimal(detalle.total),
+          venta_grabada: formatNumberDecimal(venta_grabada),
+          venta_nosujeto: formatNumberDecimal(venta_nosujeto),
+          venta_exenta: formatNumberDecimal(venta_exenta),
         });
       }
     }
@@ -191,28 +192,29 @@ export class FacturaService {
         giro,
         id_municipio,
         id_bloque,
-        efectivo,
         id_descuento,
         id_cliente,
-        tarjeta,
-        cheque,
-        transferencia,
-        credito,
         id_metodo_pago,
-        subtotal,
-        descuento,
-        iva,
-        iva_retenido,
-        iva_percivido,
-        total,
         id_usuario,
-        descuNoSuj,
-        descuExenta,
-        descuGravada,
-        totalNoSuj,
-        totalExenta,
-        totalGravada,
-        totalNoGravado,
+
+        efectivo: formatNumberDecimal(efectivo),
+        tarjeta: formatNumberDecimal(tarjeta),
+        cheque: formatNumberDecimal(cheque),
+        transferencia: formatNumberDecimal(transferencia),
+        credito: formatNumberDecimal(credito),
+        subtotal: formatNumberDecimal(subtotal),
+        descuento: formatNumberDecimal(descuento),
+        iva: formatNumberDecimal(iva),
+        iva_retenido: formatNumberDecimal(iva_retenido),
+        iva_percivido: formatNumberDecimal(iva_percivido),
+        total: formatNumberDecimal(total),
+        descuNoSuj: formatNumberDecimal(descuNoSuj),
+        descuExenta: formatNumberDecimal(descuExenta),
+        descuGravada: formatNumberDecimal(descuGravada),
+        totalNoSuj: formatNumberDecimal(totalNoSuj),
+        totalExenta: formatNumberDecimal(totalExenta),
+        totalGravada: formatNumberDecimal(totalGravada),
+        totalNoGravado: formatNumberDecimal(totalNoGravado),
       },
     });
     if (factura == null) {
