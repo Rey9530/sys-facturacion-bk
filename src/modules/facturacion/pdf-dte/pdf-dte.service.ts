@@ -23,7 +23,7 @@ export class PdfDteService {
         "extensions": {
           "chrome": {
             "launchOptions": {
-              "args": ["--no-sandbox"]
+              "args": ["--no-sandbox", '--disable-setuid-sandbox']
             }
           }
         }
