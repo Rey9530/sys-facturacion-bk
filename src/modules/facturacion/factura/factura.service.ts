@@ -418,10 +418,10 @@ export class FacturaService {
         },
         id_sucursal,
       },
-      include: { Bloque: { include: { Tipo: true } } },
+      include: { Bloque: { include: { Tipo: true } }, Cliente: true },
       orderBy: [
         {
-          id_factura: 'asc',
+          id_factura: 'desc',
         },
       ],
     });
@@ -554,7 +554,7 @@ export class FacturaService {
   }
 
   update(id: number, updateFacturaDto: UpdateFacturaDto) {
-    return `This action updates a #${id} factura`; 
+    return `This action updates a #${id} factura`;
   }
 
   async remove(id_factura: number, user: Usuarios, tipoAnulacion: number, motivoAnulacion: string) {

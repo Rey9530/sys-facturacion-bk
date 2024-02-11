@@ -45,6 +45,6 @@ export class SendEmailsService {
             })
             .then(console.log)
             .catch(console.error);
-        return 'Email sent';
+        return 'Correo enviado';
     }
 }

@@ -280,8 +280,8 @@ export class ElectronicaService {
       },
       data: datos, // Los datos que se enviarán en el cuerpo de la solicitud
     };
-    try { 
-      const respuesta: AxiosResponse = await axios.request(config); 
+    try {
+      const respuesta: AxiosResponse = await axios.request(config);
       return respuesta.data.body;
     } catch (error) {
       console.log(error.response)
@@ -388,7 +388,25 @@ export class ElectronicaService {
             dte_procesado: true,
           }
         });
-        const factura_s = await this.prisma.facturas.findFirst({ where: { id_factura: factura.id_factura }, include: { Cliente: true } });
+        const factura_s = await this.prisma.facturas.findFirst({
+          where: { id_factura: factura.id_factura },
+          include: {
+            FacturasDetalle: true,
+            Sucursal: { include: { DTETipoEstablecimiento: true, Municipio: { include: { Departamento: true } } } },
+            Bloque: {
+              include: {
+                Tipo: true,
+              },
+            },
+            Cliente: {
+              include: {
+                Municipio: { include: { Departamento: true } },
+                DTEActividadEconomica: true,
+                DTETipoDocumentoIdentificacion: true,
+              }
+            }
+          },
+        });
         var jsonDte = JSON.parse(factura_s.dte_json);
         jsonDte.firmaElectronica = token;
         jsonDte.selloRecibido = respuesta.data.selloRecibido;
@@ -587,7 +605,7 @@ export class ElectronicaService {
     jsonDte.firmaElectronica = token;
     jsonDte.selloRecibido = respSello.selloRecibido;
     if (verifyEmail(factura_s.Cliente.correo ?? "") && factura_s.Cliente.correo.length > 0) {
-      this.serviceEmail.sendEmailInvoice(factura_s, jsonDte);
+      return this.serviceEmail.sendEmailInvoice(factura_s, jsonDte);
     }
   }
 
