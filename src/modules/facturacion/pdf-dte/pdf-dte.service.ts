@@ -19,7 +19,15 @@ export class PdfDteService {
     this.jsreport.use(JsReportChromePdf());
 
     this.jsreport
-      .init()
+      .init({
+        "extensions": {
+          "chrome": {
+            "launchOptions": {
+              "args": ["--no-sandbox"]
+            }
+          }
+        }
+      })
       .then(() => {
         console.log('JsReport initialized successfully');
       })
@@ -29,7 +37,7 @@ export class PdfDteService {
   }
 
   async generatePdfFactura(factura_s: any): Promise<Buffer> {
- 
+
     const dataGeneral = await this.prisma.generalData.findFirst();
     var jsonDte = JSON.parse(factura_s.dte_json);
     var jsonFirma = JSON.parse(factura_s.response_dte_json);
