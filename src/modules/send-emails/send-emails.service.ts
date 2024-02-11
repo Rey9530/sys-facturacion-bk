@@ -15,33 +15,31 @@ export class SendEmailsService {
         private readonly prismaService: PrismaService,
     ) { }
 
-    async sendEmailInvoice(to, json, from, nameJson, id_factura) {
+    async sendEmailInvoice(factura, json) {
         const data = await this.prismaService.generalData.findFirstOrThrow();
         if (!data) throw new InternalServerErrorException('No se encontraron datos generales');
         const TOKEN = data.token_email;//"";
-        const SENDER_EMAIL = "<" + data.sender_email + ">";//invoices@relex-dev.com
-        const RECIPIENT_EMAIL = "<" + to + ">";
+        const SENDER_EMAIL = "<" + data.sender_email + ">";
+        const RECIPIENT_EMAIL = "<" + factura.Cliente.correo + ">";
 
         const client = new MailtrapClient({ token: TOKEN });
         const sender = { name: data.sender_email, email: SENDER_EMAIL };
-        const contenidoBase64 = Buffer.from(json).toString('base64');
-        const pdfBase64 = await this.pdfDteService.generatePdfFactura(id_factura); 
         let array: Attachment[] = [
             {
-                filename: nameJson + '.json',
+                filename: json.identificacion.numeroControl + '.json',
                 type: "application/json",
-                content: contenidoBase64,
+                content: Buffer.from(JSON.stringify(json)).toString('base64'),
             }, {
-                filename: nameJson + '.pdf',
+                filename: json.identificacion.numeroControl + '.pdf',
                 type: "application/pdf",
-                content: pdfBase64,
+                content: await this.pdfDteService.generatePdfFactura(factura),
             }
         ]
         client
             .send({
                 from: sender,
                 to: [{ email: RECIPIENT_EMAIL }],
-                subject: "Factura " + nameJson.replace('.json', ''),
+                subject: "Factura " + json.identificacion.numeroControl,
                 text: "Gracias pro su preferencia!",
                 attachments: array
             })

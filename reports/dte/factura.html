@@ -20,7 +20,7 @@
 
 <body style="text-align: center;">
     <br><br>
-    <h6>DOCUMENTO TRIBUTARIO ELECTRÓNICO <br>FACTURA</h6>
+    <h6>DOCUMENTO TRIBUTARIO ELECTRÓNICO<br>{{:nombreFactura}}</h6>
     <div class="row px-4 ">
         <div class="col-5">
             <table>
@@ -63,7 +63,7 @@
     <div class="row px-4  pt-2">
         <div class="col-6">
             <p class="p-0 m-0 small-title">EMISOR</p>
-            <div class="border rounded" style="height:170px;">
+            <div class="border rounded" style="height:180px;">
                 <table style="width: 100%; ">
                     <tr>
                         <td style="width: 35%;" class="small-1 p-0 m-0 text-end pe-2">Nombre o razón social:</td>
@@ -108,28 +108,68 @@
 
         <div class=" col-6  ">
             <p class="p-0 m-0 small-title">RECEPTOR</p>
-            <div class="border rounded" style="height:170px;">
+            <div class="border rounded" style="height:180px;">
                 <table style="width: 100%;">
+                    {{if receptor.nombre}}
                     <tr>
                         <td style="width: 50%;" class="small-1 p-0 m-0 text-end pe-2">Nombre o razón socia:</td>
                         <td style="width: 50%;" class="small-1 p-0 m-0 text-start pe-2">{{:receptor.nombre}}</td>
                     </tr>
+                    {{else}}
+                    {{/if}}
+
+
+                    {{if receptor.tipoDocumento}}
+
                     <tr>
                         <td class="small-1 p-0 m-0 text-end pe-2">Tipo de doc. de Identificación:</td>
                         <td class="small-1 p-0 m-0 text-start pe-2">{{:receptor.tipoDocumento}}</td>
                     </tr>
+                    {{else}}
+                    {{/if}}
+
+                    {{if receptor.numDocumento}}
+
                     <tr>
                         <td class="small-1 p-0 m-0 text-end pe-2">N° de doc. de Identificación:</td>
                         <td class="small-1 p-0 m-0 text-start pe-2">{{:receptor.numDocumento}}</td>
                     </tr>
+                    {{else}}
+                    {{/if}}
+
+                    {{if receptor.nit}}
+
+                    <tr>
+                        <td class="small-1 p-0 m-0 text-end pe-2">NIT:</td>
+                        <td class="small-1 p-0 m-0 text-start pe-2">{{:receptor.nit}}</td>
+                    </tr>
+                    {{else}}
+                    {{/if}} 
+                    {{if receptor.descActividad}}
+
+                    <tr>
+                        <td class="small-1 p-0 m-0 text-end pe-2">Actividad económica:</td>
+                        <td class="small-1 p-0 m-0 text-start pe-2">{{:receptor.descActividad}}</td>
+                    </tr>
+                    {{else}}
+                    {{/if}}
+                    {{if receptor.correo}}
+
                     <tr>
                         <td class="small-1 p-0 m-0 text-end pe-2">Correo Electrónico:</td>
                         <td class="small-1 p-0 m-0 text-start pe-2">{{:receptor.correo}}</td>
                     </tr>
+                    {{else}}
+                    {{/if}}
+                    {{if receptor.nombreComercial}}
+
                     <tr>
                         <td class="small-1 p-0 m-0 text-end pe-2">Nombre Comercial:</td>
-                        <td class="small-1 p-0 m-0 text-start pe-2"></td>
+                        <td class="small-1 p-0 m-0 text-start pe-2">{{:receptor.nombreComercial}}</td>
                     </tr>
+                    {{else}}
+                    {{/if}}
+
                 </table>
             </div>
         </div>
@@ -240,6 +280,19 @@
                             gravada:</td>
                         <td class="small-1 p-0 m-0 text-end">{{:resumen.descuGravada}}</td>
                     </tr>
+                    {{if resumen.tributos  && resumen.tributos.length > 0}}
+
+                    {{for resumen.tributos}}
+                    <tr>
+                        <td class="small-1 p-0 m-0 text-end" colspan="5"></td>
+                        <td class="small-1 p-0 m-0 text-end" colspan="4">{{>descripcion}}</td>
+                        <td class="small-1 p-0 m-0 text-end">
+                            {{>valor}}
+                        </td>
+                    </tr>
+                    {{/for}}
+                    {{else}}
+                    {{/if}}
                     <tr>
                         <td class="small-1 p-0 m-0 text-end" colspan="5"></td>
                         <td class="small-1 p-0 m-0 text-end" colspan="4">Sub-Total:</td>

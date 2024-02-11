@@ -94,6 +94,14 @@ export class FacturaController {
     return this.facturaService.resendDte(id, user);
   }
 
+
+  @Get('resend_email/:id')
+  resendEmailDte(
+    @Param('id', ParseIntPipe) id: number
+  ) {
+    return this.facturaService.resendEmailDte(id);
+  }
+
   @Get('obtener_municipios/:id')
   obtenerListadoMunicipios(@Param('id', ParseIntPipe) id: number) {
     return this.facturaService.obtenerListadoMunicipios(id);

@@ -27,15 +27,13 @@ export class PdfDteService {
         console.error('Error initializing JsReport', err);
       });
   }
- 
-  async generatePdfFactura(id_factura): Promise<Buffer> {
 
-    const factura_s = await this.prisma.facturas.findFirst({ where: { id_factura }, include: { Cliente: { include: { DTETipoDocumentoIdentificacion: true } } } });
-    const sucursal = await this.prisma.sucursales.findFirst({ where: { id_sucursal: factura_s.id_sucursal }, include: { Municipio: { include: { Departamento: true } } } });
+  async generatePdfFactura(factura_s: any): Promise<Buffer> {
+ 
     const dataGeneral = await this.prisma.generalData.findFirst();
     var jsonDte = JSON.parse(factura_s.dte_json);
     var jsonFirma = JSON.parse(factura_s.response_dte_json);
-    jsonDte.emisor.direccion = sucursal.Municipio.nombre + ', ' + sucursal.Municipio.Departamento.nombre + ", " + sucursal.complemento;
+    jsonDte.emisor.direccion = factura_s.Sucursal.Municipio.nombre + ', ' + factura_s.Sucursal.Municipio.Departamento.nombre + ", " + factura_s.Sucursal.complemento;
     const tipoEstablecimiento = await this.prisma.dTETipoEstablecimiento.findFirst({ where: { codigo: jsonDte.emisor.tipoEstablecimiento } });
     jsonDte.emisor.tipoEstablecimiento = tipoEstablecimiento.nombre;
 
@@ -74,13 +72,15 @@ export class PdfDteService {
     jsonDte.identificacion.tipoModelo = jsonDte.identificacion.tipoModelo == 1 ? "Modelo Facturación previo" : "Modelo de Facturación Diferido";
     jsonDte.qr = await this.generateQr("https://admin.factura.gob.sv/consultaPublica?ambiente=" + dataGeneral.ambiente + "&codGen=" + jsonDte.identificacion.codigoGeneracion + "&fechaEmi=" + jsonDte.identificacion.fecEmi);
     let template = '';
-    if (jsonDte.identificacion.tipoDte = "01") {
-      template = 'reports/dte/factura.html';
+    jsonDte.nombreFactura = "N/A";
+    if (jsonDte.identificacion.tipoDte == "01") {
+      jsonDte.nombreFactura = "FACTURA";
     }
-    if (jsonDte.identificacion.tipoDte = "03") {
-      template = 'reports/dte/credito-fiscal.html';
+    if (jsonDte.identificacion.tipoDte == "03") {
+      jsonDte.nombreFactura = "COMPROBANTE DE CRÉDITO FISCAL";
     }
 
+    template = 'reports/dte/factura.html';
     return this.renderPdf(jsonDte, template);
   }
 

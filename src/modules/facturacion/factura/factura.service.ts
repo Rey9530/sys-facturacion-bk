@@ -393,13 +393,13 @@ export class FacturaService {
     });
   }
   async obtenerListadoFacturas(query: FechasFacturaDto, user: Usuarios) {
-    
+
     var desde1: any = query.desde.toString().split("-");
     var hasta1: any = query.hasta.toString().split("-");
     var desde = new Date(desde1[0], desde1[1] - 1, desde1[2], 0, 0, 0);
     var hasta = new Date(hasta1[0], hasta1[1] - 1, hasta1[2], 23, 59, 59);
     hasta.setDate(hasta.getDate() + 1);
-    
+
     let id_sucursal = Number(user.id_sucursal);
     var total_facturado = 0;
     var total_facturas = 0;
@@ -545,13 +545,16 @@ export class FacturaService {
     });
     return await this.serviceDTE.generarFacturaElectronica(facturaCreada);
   }
+  async resendEmailDte(id_factura: number) {
+    return await this.serviceDTE.resendEmails(id_factura);
+  }
 
   async findOne(id: number) {
     return `This action returns a #${id} factura`;
   }
 
   update(id: number, updateFacturaDto: UpdateFacturaDto) {
-    return `This action updates a #${id} factura`;
+    return `This action updates a #${id} factura`; 
   }
 
   async remove(id_factura: number, user: Usuarios, tipoAnulacion: number, motivoAnulacion: string) {

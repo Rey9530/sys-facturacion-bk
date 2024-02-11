@@ -271,7 +271,6 @@ export class ElectronicaService {
       "passwordPri": dataSistem.private_key,
       "dteJson": data
     }
-    console.log(datos)
     let path_ = `${this.configService.get('API_FIRMA')}firmardocumento/`;
     const config: AxiosRequestConfig = {
       method: 'post', // Especifica el método HTTP
@@ -281,12 +280,8 @@ export class ElectronicaService {
       },
       data: datos, // Los datos que se enviarán en el cuerpo de la solicitud
     };
-    try {
-      console.log(path_)
-      const respuesta: AxiosResponse = await axios.request(config);
-      console.log(respuesta.data)
-      console.log(respuesta.status)
-      console.log(respuesta.data.observaciones)
+    try { 
+      const respuesta: AxiosResponse = await axios.request(config); 
       return respuesta.data.body;
     } catch (error) {
       console.log(error.response)
@@ -398,7 +393,7 @@ export class ElectronicaService {
         jsonDte.firmaElectronica = token;
         jsonDte.selloRecibido = respuesta.data.selloRecibido;
         if (verifyEmail(factura_s.Cliente.correo ?? "") && factura_s.Cliente.correo.length > 0) {
-          this.serviceEmail.sendEmailInvoice(factura_s.Cliente.correo, JSON.stringify(jsonDte), dataSistem.correo, jsonDte.identificacion.numeroControl,factura_s.id_factura);
+          this.serviceEmail.sendEmailInvoice(factura_s, jsonDte);
         }
 
       }
@@ -563,5 +558,37 @@ export class ElectronicaService {
     return await this.firmarDocumento(data, dataSistem);
   }
 
+  async resendEmails(id_factura: number) {
+
+    const factura_s = await this.prisma.facturas.findFirst({
+      where: { id_factura },
+      include: {
+        FacturasDetalle: true,
+        Sucursal: { include: { DTETipoEstablecimiento: true, Municipio: { include: { Departamento: true } } } },
+        Bloque: {
+          include: {
+            Tipo: true,
+          },
+        },
+        Cliente: {
+          include: {
+            Municipio: { include: { Departamento: true } },
+            DTEActividadEconomica: true,
+            DTETipoDocumentoIdentificacion: true,
+          }
+        }
+      },
+    });
+
+    var jsonDte = JSON.parse(factura_s.dte_json);
+    var respSello = JSON.parse(factura_s.response_dte_json);
+    const dataSistem = await this.prisma.generalData.findFirst();
+    let token = await this.firmarDocumento(jsonDte, dataSistem);
+    jsonDte.firmaElectronica = token;
+    jsonDte.selloRecibido = respSello.selloRecibido;
+    if (verifyEmail(factura_s.Cliente.correo ?? "") && factura_s.Cliente.correo.length > 0) {
+      this.serviceEmail.sendEmailInvoice(factura_s, jsonDte);
+    }
+  }
 
 }
