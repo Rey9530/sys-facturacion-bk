@@ -27,7 +27,7 @@ import {
 @Auth()
 @ApiBearerAuth(HEADER_API_BEARER_AUTH)
 export class FacturaController {
-  constructor(private readonly facturaService: FacturaService) { }
+  constructor(private readonly facturaService: FacturaService) {}
 
   @Post()
   create(
@@ -73,6 +73,11 @@ export class FacturaController {
     return this.facturaService.obtenerListadoFacturas(data, user);
   }
 
+  @Get('listado_error_dte')
+  listadoFacturasErrorDTE() {
+    return this.facturaService.listadoFacturasErrorDTE();
+  }
+
   @Get('obtener_departamentos')
   obtenerListadoDepartamentos() {
     return this.facturaService.obtenerListadoDepartamentos();
@@ -87,18 +92,12 @@ export class FacturaController {
   }
 
   @Get('resend_dte/:id')
-  resendDte(
-    @Param('id', ParseIntPipe) id: number,
-    @GetUser() user: Usuarios,
-  ) {
+  resendDte(@Param('id', ParseIntPipe) id: number, @GetUser() user: Usuarios) {
     return this.facturaService.resendDte(id, user);
   }
 
-
   @Get('resend_email/:id')
-  resendEmailDte(
-    @Param('id', ParseIntPipe) id: number
-  ) {
+  resendEmailDte(@Param('id', ParseIntPipe) id: number) {
     return this.facturaService.resendEmailDte(id);
   }
 
@@ -135,6 +134,11 @@ export class FacturaController {
     @Query('motiveInvalidation') motiveInvalidation: string,
     @GetUser() user: Usuarios,
   ) {
-    return this.facturaService.remove(id, user, tipeInvalidation, motiveInvalidation);
+    return this.facturaService.remove(
+      id,
+      user,
+      tipeInvalidation,
+      motiveInvalidation,
+    );
   }
 }

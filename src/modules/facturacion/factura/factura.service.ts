@@ -20,7 +20,7 @@ export class FacturaService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly serviceDTE: ElectronicaService,
-  ) { }
+  ) {}
 
   async create(createFacturaDto: CreateFacturaDto, user: Usuarios) {
     let {
@@ -133,18 +133,21 @@ export class FacturaService {
           .padStart(6, '0');
         await this.descargarItemDeInventario(detalle, no_fact);
 
-        let venta_grabada = detalle.tipo == "GRABADO" ? detalle.total : 0;
-        let venta_nosujeto = detalle.tipo == "NOSUJETO" ? detalle.total : 0;
-        let venta_exenta = detalle.tipo == "EXENTA" ? detalle.total : 0;
+        let venta_grabada = detalle.tipo == 'GRABADO' ? detalle.total : 0;
+        let venta_nosujeto = detalle.tipo == 'NOSUJETO' ? detalle.total : 0;
+        let venta_exenta = detalle.tipo == 'EXENTA' ? detalle.total : 0;
 
         // descuNoSuj = descuNoSuj + (detalle.tipo == "NOSUJETO" ? detalle.descuento : 0);
         // descuExenta = descuExenta + (detalle.tipo == "EXENTA" ? detalle.descuento : 0);
         // descuGravada = descuGravada + (detalle.tipo == "GRABADO" ? detalle.descuento : 0);
 
-        totalNoSuj = totalNoSuj + (detalle.tipo == "NOSUJETO" ? detalle.total : 0);
-        totalExenta = totalExenta + (detalle.tipo == "EXENTA" ? detalle.total : 0);
-        totalGravada = totalGravada + (detalle.tipo == "GRABADO" ? detalle.total : 0);
-        iva = iva + (detalle.tipo == "GRABADO" ? detalle.iva : 0);
+        totalNoSuj =
+          totalNoSuj + (detalle.tipo == 'NOSUJETO' ? detalle.total : 0);
+        totalExenta =
+          totalExenta + (detalle.tipo == 'EXENTA' ? detalle.total : 0);
+        totalGravada =
+          totalGravada + (detalle.tipo == 'GRABADO' ? detalle.total : 0);
+        iva = iva + (detalle.tipo == 'GRABADO' ? detalle.iva : 0);
         db_detalle.push({
           tipo_detalle: detalle.tipo,
           id_factura: 0,
@@ -161,7 +164,7 @@ export class FacturaService {
             (detalle.id_descuento != null && detalle.id_descuento) > 0
               ? detalle.id_descuento
               : null,
-          iva: formatNumberDecimal(detalle.tipo == "GRABADO" ? detalle.iva : 0),
+          iva: formatNumberDecimal(detalle.tipo == 'GRABADO' ? detalle.iva : 0),
           total: formatNumberDecimal(detalle.total),
           venta_grabada: formatNumberDecimal(venta_grabada),
           venta_nosujeto: formatNumberDecimal(venta_nosujeto),
@@ -222,12 +225,12 @@ export class FacturaService {
       throw new InternalServerErrorException('Error inesperado reviosar log');
     }
     try {
-      console.log("Llegamos qui");
+      console.log('Llegamos qui');
       db_detalle = db_detalle.map((e) => {
         e.id_factura = factura.id_factura;
         return e;
       });
-      console.log("Llegamos qui222");
+      console.log('Llegamos qui222');
       //TODO: hacer la verificasion por si el numero actual ya se paso el limite del campo hasta
       await this.prisma.facturasBloques.update({
         data: { actual: bloque!.actual + 1 },
@@ -236,12 +239,17 @@ export class FacturaService {
       await this.prisma.facturasDetalle.createMany({
         data: db_detalle,
       });
-      console.log("Llegamos qui33");
+      console.log('Llegamos qui33');
       const facturaCreada = await this.prisma.facturas.findUnique({
         where: { id_factura: factura.id_factura },
         include: {
           FacturasDetalle: true,
-          Sucursal: { include: { DTETipoEstablecimiento: true, Municipio: { include: { Departamento: true } } } },
+          Sucursal: {
+            include: {
+              DTETipoEstablecimiento: true,
+              Municipio: { include: { Departamento: true } },
+            },
+          },
           Bloque: {
             include: {
               Tipo: true,
@@ -253,14 +261,14 @@ export class FacturaService {
               Municipio: { include: { Departamento: true } },
               DTEActividadEconomica: true,
               DTETipoDocumentoIdentificacion: true,
-            }
-          }
+            },
+          },
         },
       });
-      console.log("Llegamos qui444");
+      console.log('Llegamos qui444');
       this.serviceDTE.generarFacturaElectronica(facturaCreada);
 
-      console.log("Llegamos qui555");
+      console.log('Llegamos qui555');
       return facturaCreada;
     } catch (error) {
       console.log(error);
@@ -310,7 +318,7 @@ export class FacturaService {
             },
           };
         }),
-        estado: 'ACTIVO'
+        estado: 'ACTIVO',
       },
       include: {
         Inventario: {
@@ -394,10 +402,17 @@ export class FacturaService {
       where: { estado: 'ACTIVO' },
     });
   }
-  async obtenerListadoFacturas(query: FechasFacturaDto, user: Usuarios) {
 
-    var desde1: any = query.desde.toString().split("-");
-    var hasta1: any = query.hasta.toString().split("-");
+  async listadoFacturasErrorDTE() {
+    return await this.prisma.facturas.findMany({
+      where: { estado: 'ACTIVO', dte_procesado: false },
+
+      include: { Bloque: { include: { Tipo: true } }, Cliente: true },
+    });
+  }
+  async obtenerListadoFacturas(query: FechasFacturaDto, user: Usuarios) {
+    var desde1: any = query.desde.toString().split('-');
+    var hasta1: any = query.hasta.toString().split('-');
     var desde = new Date(desde1[0], desde1[1] - 1, desde1[2], 0, 0, 0);
     var hasta = new Date(hasta1[0], hasta1[1] - 1, hasta1[2], 23, 59, 59);
     hasta.setDate(hasta.getDate() + 1);
@@ -441,7 +456,9 @@ export class FacturaService {
         total_facturas_credito_fiscal++;
       }
     });
-    let tipoInvalidacion = await this.prisma.dTETipoInvalidacion.findMany({ where: { estado: 'ACTIVO' } });
+    let tipoInvalidacion = await this.prisma.dTETipoInvalidacion.findMany({
+      where: { estado: 'ACTIVO' },
+    });
 
     return {
       tipoInvalidacion,
@@ -530,7 +547,12 @@ export class FacturaService {
       where: { id_factura: id_factura },
       include: {
         FacturasDetalle: true,
-        Sucursal: { include: { DTETipoEstablecimiento: true, Municipio: { include: { Departamento: true } } } },
+        Sucursal: {
+          include: {
+            DTETipoEstablecimiento: true,
+            Municipio: { include: { Departamento: true } },
+          },
+        },
         Bloque: {
           include: {
             Tipo: true,
@@ -541,8 +563,8 @@ export class FacturaService {
             Municipio: { include: { Departamento: true } },
             DTEActividadEconomica: true,
             DTETipoDocumentoIdentificacion: true,
-          }
-        }
+          },
+        },
       },
     });
     return await this.serviceDTE.generarFacturaElectronica(facturaCreada);
@@ -559,7 +581,12 @@ export class FacturaService {
     return `This action updates a #${id} factura`;
   }
 
-  async remove(id_factura: number, user: Usuarios, tipoAnulacion: number, motivoAnulacion: string) {
+  async remove(
+    id_factura: number,
+    user: Usuarios,
+    tipoAnulacion: number,
+    motivoAnulacion: string,
+  ) {
     let id_sucursal = Number(user.id_sucursal);
     const data = await this.prisma.facturas.findMany({
       where: { estado: 'ACTIVO', id_factura, id_sucursal },
@@ -570,7 +597,12 @@ export class FacturaService {
       where: { id_factura },
       include: {
         FacturasDetalle: true,
-        Sucursal: { include: { DTETipoEstablecimiento: true, Municipio: { include: { Departamento: true } } } },
+        Sucursal: {
+          include: {
+            DTETipoEstablecimiento: true,
+            Municipio: { include: { Departamento: true } },
+          },
+        },
         Bloque: {
           include: {
             Tipo: true,
@@ -582,15 +614,20 @@ export class FacturaService {
             Municipio: { include: { Departamento: true } },
             DTEActividadEconomica: true,
             DTETipoDocumentoIdentificacion: true,
-          }
-        }
+          },
+        },
       },
     });
     var usuario = await this.prisma.usuarios.findFirst({
       where: { id: user.id, estado: 'ACTIVO' },
-      include: { DTETipoDocumentoIdentificacion: true }
+      include: { DTETipoDocumentoIdentificacion: true },
     });
-    let resp = await this.serviceDTE.anularFacturaElectronica(facturaCreada, usuario, tipoAnulacion, motivoAnulacion);
+    let resp = await this.serviceDTE.anularFacturaElectronica(
+      facturaCreada,
+      usuario,
+      tipoAnulacion,
+      motivoAnulacion,
+    );
     await this.prisma.facturas.update({
       where: { id_factura },
       data: { estado: 'ANULADA' },
