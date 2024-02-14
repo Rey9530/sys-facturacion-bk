@@ -20,6 +20,7 @@ import {
   CierreManualTDO,
   BuscartCatalogoDto,
   FechasFacturaDto,
+  ContingencyDto,
 } from './dto';
 
 @Controller('facturacion/factura')
@@ -27,7 +28,7 @@ import {
 @Auth()
 @ApiBearerAuth(HEADER_API_BEARER_AUTH)
 export class FacturaController {
-  constructor(private readonly facturaService: FacturaService) {}
+  constructor(private readonly facturaService: FacturaService) { }
 
   @Post()
   create(
@@ -35,6 +36,14 @@ export class FacturaController {
     @GetUser() user: Usuarios,
   ) {
     return this.facturaService.create(createFacturaDto, user);
+  }
+
+  @Post("crear/contingencia")
+  createContingencia(
+    @Body() contingency: ContingencyDto,
+    @GetUser() user: Usuarios,
+  ) {
+    return this.facturaService.createContingencia(contingency, user);
   }
   @Post('cierre_manual')
   cierreManual(@Body() dataDto: CierreManualTDO, @GetUser() user: Usuarios) {

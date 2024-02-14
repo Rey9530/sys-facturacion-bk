@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from 'src/common/services';
 import { Facturas, GeneralData, Usuarios } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
@@ -171,6 +171,8 @@ export class ElectronicaService {
         "ivaItem": element.iva ?? 0
       });
     }
+
+    const contingencia = await this.prisma.contingenciasDetalle.findFirst({ where: { id_factura: factura.id_factura }, include: { Contingencias: true } });
     let data = {
       "identificacion": {
         "version": factura.Bloque.Tipo.version,
@@ -178,10 +180,10 @@ export class ElectronicaService {
         "tipoDte": factura.Bloque.Tipo.codigo,
         "numeroControl": numeroControl,
         "codigoGeneracion": uuid.toUpperCase(),
-        "tipoModelo": 1,
-        "tipoOperacion": 1,
-        "tipoContingencia": null,
-        "motivoContin": null,
+        "tipoModelo": contingencia != null ? 2 : 1,
+        "tipoOperacion": contingencia != null ? 2 : 1,
+        "tipoContingencia": contingencia != null ? contingencia.Contingencias.tipo : null,
+        "motivoContin": contingencia != null ? contingencia.Contingencias.motivo : null,
         "fecEmi": fechaFormateada.toString().split(' ')[0],
         "horEmi": fechaFormateada.toString().split(' ')[1],
         "tipoMoneda": "USD"
@@ -307,6 +309,177 @@ export class ElectronicaService {
     }
     return await this.envairFactura(factura, token);
   }
+  async generarContingencia(id_contingencia: any) {
+
+    const dataSistem = await this.prisma.generalData.findFirst();
+    const contingencia = await this.prisma.contingencias.findFirst({ where: { id_contingencia }, include: { Usuarios: { include: { DTETipoDocumentoIdentificacion: true, Sucursales: { include: { DTETipoEstablecimiento: true } } } }, ContingenciasDetalle: true } });
+
+    let fechaFormateada = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
+    let uuid = uuidv5(contingencia.id_contingencia.toString(), uuidv4());
+    let arrayDte = [];
+    let index = 1;
+    for (let item of contingencia.ContingenciasDetalle) {
+      arrayDte.push({
+        "noItem": index,
+        "codigoGeneracion": item.codigoGeneracion,
+        "tipoDoc": item.tipoDoc
+      });
+      index++;
+    }
+
+    let data = {
+      "identificacion": {
+        "version": 3,
+        "ambiente": dataSistem.ambiente,
+        "codigoGeneracion": uuid.toUpperCase(),
+        "fTransmision": fechaFormateada.toString().split(' ')[0],
+        "hTransmision": fechaFormateada.toString().split(' ')[1]
+      },
+      "emisor": {
+        "nit": eliminarGuionesYEspacios(dataSistem.nit),
+        "nombre": dataSistem.nombre_sistema,
+        "nombreResponsable": contingencia.Usuarios.nombres + ' ' + contingencia.Usuarios.apellidos,
+        "tipoDocResponsable": contingencia.Usuarios.DTETipoDocumentoIdentificacion != null ? contingencia.Usuarios.DTETipoDocumentoIdentificacion.codigo : null,
+        "numeroDocResponsable": contingencia.Usuarios.dui,
+        "tipoEstablecimiento": contingencia.Usuarios.Sucursales.DTETipoEstablecimiento != null ? contingencia.Usuarios.Sucursales.DTETipoEstablecimiento.codigo : null,
+        "codPuntoVenta": dataSistem.cod_punto_venta != null && dataSistem.cod_punto_venta.length > 0 ? dataSistem.cod_punto_venta : null,
+        "codEstableMH": dataSistem.cod_estable_MH != null && dataSistem.cod_estable_MH.length > 0 ? dataSistem.cod_estable_MH : null,
+        "telefono": eliminarGuionesYEspacios(dataSistem.contactos),
+        "correo": dataSistem.correo
+      },
+      "detalleDTE": [
+        ...arrayDte
+      ],
+      "motivo": {
+        "fInicio": contingencia.fecha_inicio,
+        "fFin": contingencia.fecha_fin,
+        "hInicio": contingencia.hora_inicio + ":00",
+        "hFin": contingencia.hora_fin + ":00",
+        "tipoContingencia": contingencia.tipo,
+        "motivoContingencia": contingencia.motivo
+      }
+    }
+    console.log(data)
+    let token = await this.firmarDocumento(data, dataSistem);
+    const respContingencia = await this.envairContingencia(dataSistem.nit, token, id_contingencia);
+    this.iniciarEnvioContingencia(contingencia, id_contingencia); 
+    return respContingencia;
+  }
+  async iniciarEnvioContingencia(contingencia, id_contingencia) {
+    let arrayIdsFacturas = [];
+    for (let factura of contingencia.ContingenciasDetalle) {
+      arrayIdsFacturas.push(factura.id_factura);
+    }
+    const facturas_list = await this.prisma.facturas.findMany({
+      where: {
+        id_factura: {
+          in: arrayIdsFacturas
+        },
+        estado: 'ACTIVO',
+        dte_procesado: false,
+      }, include: {
+        FacturasDetalle: true,
+        Sucursal: {
+          include: {
+            DTETipoEstablecimiento: true,
+            Municipio: { include: { Departamento: true } },
+          },
+        },
+        Bloque: {
+          include: {
+            Tipo: true,
+          },
+        },
+        Cliente: {
+          include: {
+            Municipio: { include: { Departamento: true } },
+            DTEActividadEconomica: true,
+            DTETipoDocumentoIdentificacion: true,
+          },
+        },
+      },
+    });
+    let arrayTokens = [];
+    for (let index = 0; index < facturas_list.length; index++) {
+      const factura = facturas_list[index];
+      let token = '';
+      if (factura.Bloque.Tipo.codigo == "01") {
+        token = await this.generateDTEFC(factura);
+      } else if (factura.Bloque.Tipo.codigo == "03") {
+        token = await this.generateDTECCF(factura);
+      }
+      arrayTokens.push(token);
+    }
+    await this.envairLoteFactura(arrayTokens, id_contingencia);
+  }
+
+
+  async envairContingencia(nit: any, token: string, id_contingencia: number) {
+    var data = {
+      // "ambiente": dataSistem.ambiente,
+      // "idEnvio": 1,
+      // "version": factura.Bloque.Tipo.version,
+      // "tipoDte": factura.Bloque.Tipo.codigo,
+      // "codigoGeneracion": "2",
+      "nit": nit,
+      "documento": token
+    }
+    let path_ = `${this.configService.get('API_FACTURACION')}fesv/contingencia`;
+    var jwt = await this.validarToken();
+    const config: AxiosRequestConfig = {
+      timeout: TIMEOUTAXIOS,
+      signal: AbortSignal.timeout(TIMEOUTAXIOS),
+      method: 'post', // Especifica el método HTTP
+      url: path_,       // URL a la que se realizará la solicitud
+      headers: {
+        'Content-Type': 'application/json', // Especifica el tipo de contenido esperado 
+        'Authorization': 'Bearer ' + jwt, // Especifica el tipo de contenido esperado 
+      },
+      data, // Los datos que se enviarán en el cuerpo de la solicitud
+    };
+    try {
+      console.log(path_)
+      const respuesta: AxiosResponse = await axios.request(config);
+      console.log(respuesta.data)
+      console.log(respuesta.status)
+      console.log(respuesta.data.observaciones)
+      if (respuesta.status == 200 && respuesta.data.estado != null && respuesta.data.estado == 'RECIBIDO') {
+        await this.prisma.contingencias.update({
+          where: { id_contingencia },
+          data: {
+            json_response: JSON.stringify(respuesta.data)
+          }
+        });
+      } else {
+        throw new InternalServerErrorException(respuesta.data.observaciones.toString())
+      }
+      return respuesta.data;
+    } catch (error) {
+      if ((error.response.data == null) && error.response.message != null) {
+        throw new InternalServerErrorException(error.response.message)
+      }
+      let msjError = '';
+      if (error.response == undefined) {
+        msjError += "Error de conexion con el serviodr de MH, favor intentarlo nuevamente mas tarde";
+      } else {
+        console.log(error.response) // Mensaje de error
+        console.log(error.response.data) // Mensaje de error
+        console.log(error.response.data.observaciones) // Mensaje de error
+        if (error.response.data.observaciones != null && Array.isArray(error.response.data.observaciones)) {
+          for (let index = 0; index < error.response.data.observaciones.length; index++) {
+            const element = error.response.data.observaciones[index];
+            msjError += element + '<br>&nbsp;<br>';
+          }
+          if (error.response.data.descripcionMsg != "RECIBIDO") {
+            msjError += error.response.data.descripcionMsg + '<br>&nbsp;<br>';
+          }
+        }
+      }
+
+      throw new InternalServerErrorException(msjError)
+    }
+  }
+
   async obtenerNuevoToken(generalData: GeneralData) {
     let path_ = `${this.configService.get('API_FACTURACION')}seguridad/auth`;
     let nit = generalData.nit != null && generalData.nit.length > 0 ? generalData.nit.replace(" ", "").replace("-", "") : "00000";
@@ -365,6 +538,65 @@ export class ElectronicaService {
     return data.token_api_fac;
   }
 
+  async envairLoteFactura(facturas: any, id_contingencia: number) {
+    const dataSistem = await this.prisma.generalData.findFirst();
+    var data = {
+      "ambiente": dataSistem.ambiente,
+      "idEnvio": uuidv4().toUpperCase(),
+      "version": 2,
+      "nitEmisor": eliminarGuionesYEspacios(dataSistem.nit),
+      "documentos": [...facturas]
+    }
+    console.log(data)
+    console.timeStamp()
+    let path_ = `${this.configService.get('API_FACTURACION')}fesv/recepcionlote/`;
+    var jwt = await this.validarToken();
+    const config: AxiosRequestConfig = {
+      timeout: TIMEOUTAXIOS,
+      signal: AbortSignal.timeout(TIMEOUTAXIOS),
+      method: 'post', // Especifica el método HTTP
+      url: path_,       // URL a la que se realizará la solicitud
+      headers: {
+        'Content-Type': 'application/json', // Especifica el tipo de contenido esperado 
+        'Authorization': 'Bearer ' + jwt, // Especifica el tipo de contenido esperado 
+      },
+      data, // Los datos que se enviarán en el cuerpo de la solicitud
+    };
+    try {
+      console.log(path_)
+      const respuesta: AxiosResponse = await axios.request(config);
+      console.log(respuesta.data)
+      console.log(respuesta.status)
+      console.log(respuesta.data.observaciones)
+      if (respuesta.status == 200) {
+        await this.prisma.contingencias.update({
+          where: { id_contingencia },
+          data: {
+            json_lote: JSON.stringify(respuesta.data),
+          }
+        });
+      }
+      return respuesta.data;
+    } catch (error) {
+      let msjError = '';
+      if (error.response == undefined) {
+        msjError += "Error de conexion con el serviodr de MH, favor intentarlo nuevamente mas tarde";
+      } else {
+        console.log(error.response.data) // Mensaje de error
+        console.log(error.response.data.observaciones) // Mensaje de error
+        if (error.response.data.observaciones != null && Array.isArray(error.response.data.observaciones)) {
+          for (let index = 0; index < error.response.data.observaciones.length; index++) {
+            const element = error.response.data.observaciones[index];
+            msjError += element + '<br>&nbsp;<br>';
+          }
+          if (error.response.data.descripcionMsg != "RECIBIDO") {
+            msjError += error.response.data.descripcionMsg + '<br>&nbsp;<br>';
+          }
+        }
+      }
+      return msjError;
+    } 
+  }
   async envairFactura(factura: any, token: string) {
     const dataSistem = await this.prisma.generalData.findFirst();
     var data = {
@@ -493,6 +725,10 @@ export class ElectronicaService {
         "noGravado": 0,
       });
     }
+
+    const contingencia = await this.prisma.contingenciasDetalle.findFirst({ where: { id_factura: factura.id_factura }, include: { Contingencias: true } });
+    console.log("contingencia")
+    console.log(contingencia)
     let data = {
       "identificacion": {
         "version": factura.Bloque.Tipo.version,
@@ -500,10 +736,10 @@ export class ElectronicaService {
         "tipoDte": factura.Bloque.Tipo.codigo,
         "numeroControl": numeroControl,
         "codigoGeneracion": uuid.toUpperCase(),
-        "tipoModelo": 1,
-        "tipoOperacion": 1,
-        "tipoContingencia": null,
-        "motivoContin": null,
+        "tipoModelo": contingencia != null ? 2 : 1,
+        "tipoOperacion": contingencia != null ? 2 : 1,
+        "tipoContingencia": contingencia != null ? contingencia.Contingencias.tipo : null,
+        "motivoContin": contingencia != null ? contingencia.Contingencias.motivo : null,
         "fecEmi": fechaFormateada.toString().split(' ')[0],
         "horEmi": fechaFormateada.toString().split(' ')[1],
         "tipoMoneda": "USD"
@@ -590,6 +826,9 @@ export class ElectronicaService {
       },
       "apendice": null
     }
+    console.log("afkldsjhgkjsdhfgkjsdfklgjsldkjhfgsjldhkfghjksdfghjlksdfhjghkjldsgfhkjsdfgjhldf")
+    console.log(data)
+    console.log("afkldsjhgkjsdhfgkjsdfklgjsldkjhfgsjldhkfghjksdfghjlksdfhjghkjldsgfhkjsdfgjhldf")
     await this.prisma.facturas.update({
       where: { id_factura: factura.id_factura },
       data: {

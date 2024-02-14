@@ -11,6 +11,7 @@ import {
   CierreManualTDO,
   BuscartCatalogoDto,
   FechasFacturaDto,
+  ContingencyDto,
 } from './dto';
 import { ElectronicaService } from '../electronica/electronica.service';
 import { formatNumberDecimal } from 'src/common/helpers';
@@ -22,6 +23,70 @@ export class FacturaService {
     private readonly serviceDTE: ElectronicaService,
   ) { }
 
+  async createContingencia(contingency: ContingencyDto, user: Usuarios) {
+    let {
+      fecha_inicio = '',
+      hora_inicio = '',
+      fecha_fin = '',
+      hora_fin = '',
+      motivo = '',
+      tipo = 0,
+      facturas = [],
+    }: any = contingency;
+    let date1 = new Date(fecha_inicio + ' ' + hora_inicio);
+    let date2 = new Date(fecha_fin + ' ' + hora_fin);
+    if (date1.getTime() > date2.getTime()) {
+      throw new InternalServerErrorException("La fecha de inicio no puede ser mayor a la fecha de fin");
+    }
+    try {
+      const contingencia = await this.prisma.contingencias.create({
+        data: {
+          fecha_inicio,
+          hora_inicio,
+          fecha_fin,
+          hora_fin,
+          motivo,
+          tipo,
+          json_response: '',
+          id_usuario: user.id,
+        }
+      });
+      const facturas_list = await this.prisma.facturas.findMany({
+        where: {
+          id_factura: {
+            in: facturas
+          },
+          estado: 'ACTIVO',
+          dte_procesado: false,
+        },
+      });
+      let arrayInsert = [];
+      for (let factura of facturas_list) {
+        var jsonDte = JSON.parse(factura.dte_json);
+        arrayInsert.push({
+          id_factura: factura.id_factura,
+          codigoGeneracion: jsonDte.identificacion.codigoGeneracion,
+          tipoDoc: jsonDte.identificacion.tipoDte,
+          id_contingencia: contingencia.id_contingencia
+        });
+      }
+      await this.prisma.contingenciasDetalle.createMany({
+        data: arrayInsert
+      });
+      const respAPI = await this.serviceDTE.generarContingencia(contingencia.id_contingencia);
+      // 
+
+      // for (let factura of facturas_list) {
+      //   this.resendDte(factura.id_factura, user);
+      // }
+      return respAPI;
+    } catch (error) {
+      if ((error.response.data == null) && error.response.message != null) {
+        throw new InternalServerErrorException(error.response.message)
+      }
+      throw new InternalServerErrorException('Error inesperado reviosar log');
+    }
+  }
   async create(createFacturaDto: CreateFacturaDto, user: Usuarios) {
     let {
       cliente = '',
@@ -403,7 +468,7 @@ export class FacturaService {
   async listadoFacturasErrorDTE() {
     let facturas = await this.prisma.facturas.findMany({
       where: { estado: 'ACTIVO', dte_procesado: false },
-      include: { Bloque: { include: { Tipo: true } }, Cliente: true },
+      include: { Bloque: { include: { Tipo: true } }, Cliente: true, ContingenciasDetalle: { include: { Contingencias: true } } },
       orderBy: {
         fecha_creacion: 'desc'
       }
@@ -411,7 +476,7 @@ export class FacturaService {
     let motivos = await this.prisma.dTETipoContingencia.findMany({
       where: { estado: 'ACTIVO' },
     });
-    return {facturas, motivos };
+    return { facturas, motivos };
   }
   async obtenerListadoFacturas(query: FechasFacturaDto, user: Usuarios) {
     var desde1: any = query.desde.toString().split('-');
@@ -437,6 +502,7 @@ export class FacturaService {
           lte: hasta,
         },
         id_sucursal,
+        dte_procesado: true,
       },
       include: { Bloque: { include: { Tipo: true } }, Cliente: true },
       orderBy: [
