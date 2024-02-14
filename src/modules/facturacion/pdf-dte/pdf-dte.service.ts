@@ -48,7 +48,7 @@ export class PdfDteService {
     var token = JSON.parse(factura_s.response_dte_json);
     jsonDte.firmaElectronica = jsonFirma.selloRecibido;
     jsonDte.selloRecibido = token.selloRecibido;
-    jsonDte.receptor.tipoDocumento = factura_s.Cliente.DTETipoDocumentoIdentificacion.nombre;
+    jsonDte.receptor.tipoDocumento = factura_s.Cliente.DTETipoDocumentoIdentificacion?.nombre ?? "";
     jsonDte.resumen.totalNoSuj = formatNumber(jsonDte.resumen.totalNoSuj);
     jsonDte.resumen.totalExenta = formatNumber(jsonDte.resumen.totalExenta);
     jsonDte.resumen.totalGravada = formatNumber(jsonDte.resumen.totalGravada);
@@ -71,9 +71,9 @@ export class PdfDteService {
       element.ventaNoSuj = formatNumber(element.ventaNoSuj)
       element.ventaExenta = formatNumber(element.ventaExenta)
       element.ventaGravada = formatNumber(element.ventaGravada)
-      element.noGravado = formatNumber(element.noGravado)
+      element.noGravado = formatNumber(element.noGravado)  
       element.ivaItem = formatNumber(element.ivaItem)
-      cuerpoDocumento.push(element);
+      cuerpoDocumento.push(element); 
     }
     jsonDte.cuerpoDocumento = cuerpoDocumento;
     jsonDte.identificacion.tipoOperacion = jsonDte.identificacion.tipoOperacion == 1 ? "NORMAL" : "POR CONTINGENCIA";

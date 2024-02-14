@@ -119,56 +119,78 @@
                     {{/if}}
 
 
-                    {{if receptor.tipoDocumento}}
-
+                    {{if identificacion.tipoDte=='01'}}
                     <tr>
                         <td class="small-1 p-0 m-0 text-end pe-2">Tipo de doc. de Identificación:</td>
-                        <td class="small-1 p-0 m-0 text-start pe-2">{{:receptor.tipoDocumento}}</td>
+                        <td class="small-1 p-0 m-0 text-start pe-2">
+                            {{if receptor.tipoDocumento}}
+                            {{:receptor.tipoDocumento}}
+                            {{else}}
+                            {{/if}}
+                        </td>
                     </tr>
                     {{else}}
                     {{/if}}
-
-                    {{if receptor.numDocumento}}
-
+                    
+                    {{if identificacion.tipoDte=='01'}}
                     <tr>
                         <td class="small-1 p-0 m-0 text-end pe-2">N° de doc. de Identificación:</td>
-                        <td class="small-1 p-0 m-0 text-start pe-2">{{:receptor.numDocumento}}</td>
+                        <td class="small-1 p-0 m-0 text-start pe-2">
+                            {{if receptor.numDocumento}}
+                            {{:receptor.numDocumento}}
+                            {{else}}
+                            {{/if}}
+                        </td>
                     </tr>
                     {{else}}
                     {{/if}}
 
-                    {{if receptor.nit}}
+                    {{if identificacion.tipoDte=='02'}}
 
                     <tr>
                         <td class="small-1 p-0 m-0 text-end pe-2">NIT:</td>
-                        <td class="small-1 p-0 m-0 text-start pe-2">{{:receptor.nit}}</td>
+                        <td class="small-1 p-0 m-0 text-start pe-2">
+                            {{if receptor.nit}}
+                            {{:receptor.nit}}
+                            {{else}}
+                            {{/if}}
+                        </td>
                     </tr>
                     {{else}}
                     {{/if}} 
-                    {{if receptor.descActividad}}
 
                     <tr>
                         <td class="small-1 p-0 m-0 text-end pe-2">Actividad económica:</td>
-                        <td class="small-1 p-0 m-0 text-start pe-2">{{:receptor.descActividad}}</td>
+                        <td class="small-1 p-0 m-0 text-start pe-2">
+
+                            {{if receptor.descActividad}}
+                            {{:receptor.descActividad}}
+                            {{else}}
+                            {{/if}}
+                        </td>
                     </tr>
-                    {{else}}
-                    {{/if}}
-                    {{if receptor.correo}}
 
                     <tr>
                         <td class="small-1 p-0 m-0 text-end pe-2">Correo Electrónico:</td>
-                        <td class="small-1 p-0 m-0 text-start pe-2">{{:receptor.correo}}</td>
+                        <td class="small-1 p-0 m-0 text-start pe-2">
+
+                            {{if receptor.correo}}
+                            {{:receptor.correo}}
+                            {{else}}
+                            {{/if}}
+                        </td>
                     </tr>
-                    {{else}}
-                    {{/if}}
-                    {{if receptor.nombreComercial}}
 
                     <tr>
                         <td class="small-1 p-0 m-0 text-end pe-2">Nombre Comercial:</td>
-                        <td class="small-1 p-0 m-0 text-start pe-2">{{:receptor.nombreComercial}}</td>
+                        <td class="small-1 p-0 m-0 text-start pe-2">
+
+                            {{if receptor.nombreComercial}}
+                            {{:receptor.nombreComercial}}
+                            {{else}}
+                            {{/if}}
+                        </td>
                     </tr>
-                    {{else}}
-                    {{/if}}
 
                 </table>
             </div>
@@ -280,7 +302,7 @@
                             gravada:</td>
                         <td class="small-1 p-0 m-0 text-end">{{:resumen.descuGravada}}</td>
                     </tr>
-                    {{if resumen.tributos  && resumen.tributos.length > 0}}
+                    {{if resumen.tributos && resumen.tributos.length > 0}}
 
                     {{for resumen.tributos}}
                     <tr>

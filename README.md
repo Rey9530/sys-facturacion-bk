@@ -39,6 +39,7 @@ $ npx prisma migrate dev
 
 ## Configuraciones
 - Verificar que el publi key, private key, token_email, email_send y domain esten configurados en la tabal de generalData
+- En el sistema opcion de Configuracion->Usuarios agregar los datos del usuario
 - En el sistema opcion de Configuracion->Facturacion->Sistema agregar los datos del contribuyente
 - Configurar los dotos del usuario en el menu usuario
 - Configurar los bloques de facturas 

@@ -20,7 +20,7 @@ export class FacturaService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly serviceDTE: ElectronicaService,
-  ) {}
+  ) { }
 
   async create(createFacturaDto: CreateFacturaDto, user: Usuarios) {
     let {
@@ -266,10 +266,7 @@ export class FacturaService {
         },
       });
       console.log('Llegamos qui444');
-      this.serviceDTE.generarFacturaElectronica(facturaCreada);
-
-      console.log('Llegamos qui555');
-      return facturaCreada;
+      return await this.serviceDTE.generarFacturaElectronica(facturaCreada);
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException('Error inesperado reviosar log');
@@ -404,11 +401,17 @@ export class FacturaService {
   }
 
   async listadoFacturasErrorDTE() {
-    return await this.prisma.facturas.findMany({
+    let facturas = await this.prisma.facturas.findMany({
       where: { estado: 'ACTIVO', dte_procesado: false },
-
       include: { Bloque: { include: { Tipo: true } }, Cliente: true },
+      orderBy: {
+        fecha_creacion: 'desc'
+      }
     });
+    let motivos = await this.prisma.dTETipoContingencia.findMany({
+      where: { estado: 'ACTIVO' },
+    });
+    return {facturas, motivos };
   }
   async obtenerListadoFacturas(query: FechasFacturaDto, user: Usuarios) {
     var desde1: any = query.desde.toString().split('-');

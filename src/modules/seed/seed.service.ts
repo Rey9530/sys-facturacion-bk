@@ -64,8 +64,7 @@ export class SeedService {
           { codigo: 'C4', valor: 'Retención IVA 13%' },
           { codigo: 'C9', valor: 'Otras retenciones IVA casos especiales' },
         ],
-      });
-
+      }); 
       await this.prisma.dTETipoGeneracionDocumento.createMany({
         data: [
           { codigo: 1, valor: 'Físico' },

@@ -8,6 +8,8 @@ import { format } from 'date-fns';
 import * as jwt from 'jsonwebtoken';
 import { SendEmailsService } from 'src/modules/send-emails/send-emails.service';
 import { convertirCantidadADolaresYCentavos, eliminarGuionesYEspacios, verifyEmail } from 'src/common/helpers';
+import { TIMEOUTAXIOS } from 'src/common/const/directory';
+import e from 'express';
 
 @Injectable()
 export class ElectronicaService {
@@ -89,6 +91,8 @@ export class ElectronicaService {
     let path_ = `${this.configService.get('API_FACTURACION')}fesv/anulardte`;
     var jwt = await this.validarToken();
     const config: AxiosRequestConfig = {
+      timeout: TIMEOUTAXIOS,
+      signal: AbortSignal.timeout(TIMEOUTAXIOS),
       method: 'post', // Especifica el método HTTP
       url: path_,       // URL a la que se realizará la solicitud
       headers: {
@@ -114,6 +118,9 @@ export class ElectronicaService {
       return null;
     } catch (error) {
       console.log(error.response); // Mensaje de error
+      if (error.response == undefined) {
+        return "Error de conexion con el serviodr de MH, favor intentarlo nuevamente mas tarde";
+      }
       let msjError = '';
       if (
         error.response.data.observaciones != null &&
@@ -302,14 +309,17 @@ export class ElectronicaService {
   }
   async obtenerNuevoToken(generalData: GeneralData) {
     let path_ = `${this.configService.get('API_FACTURACION')}seguridad/auth`;
+    let nit = generalData.nit != null && generalData.nit.length > 0 ? generalData.nit.replace(" ", "").replace("-", "") : "00000";
     const config: AxiosRequestConfig = {
+      timeout: TIMEOUTAXIOS,
+      signal: AbortSignal.timeout(TIMEOUTAXIOS),
       method: 'post', // Especifica el método HTTP
       url: path_,       // URL a la que se realizará la solicitud
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       },
       data: {
-        "user": generalData.nit,
+        "user": nit,
         "pwd": generalData.public_key,
       }, // Los datos que se enviarán en el cuerpo de la solicitud
     };
@@ -331,6 +341,9 @@ export class ElectronicaService {
       }
       return null;
     } catch (error) {
+      if (error.response == undefined) {
+        return "Error de conexion con el serviodr de MH, favor intentarlo nuevamente mas tarde";
+      }
       console.log(error) // Mensaje de error
       return null;
     }
@@ -363,9 +376,12 @@ export class ElectronicaService {
       "documento": token
     }
     console.log(data)
+    console.timeStamp()
     let path_ = `${this.configService.get('API_FACTURACION')}fesv/recepciondte`;
     var jwt = await this.validarToken();
     const config: AxiosRequestConfig = {
+      timeout: TIMEOUTAXIOS,
+      signal: AbortSignal.timeout(TIMEOUTAXIOS),
       method: 'post', // Especifica el método HTTP
       url: path_,       // URL a la que se realizará la solicitud
       headers: {
@@ -415,27 +431,34 @@ export class ElectronicaService {
         }
 
       }
-      return null;
+      return respuesta.data;
     } catch (error) {
+      console.log("error=====================>")
       let msjError = '';
-      console.log(error.response.data) // Mensaje de error
-      console.log(error.response.data.observaciones) // Mensaje de error
-      if (error.response.data.observaciones != null && Array.isArray(error.response.data.observaciones)) {
-        for (let index = 0; index < error.response.data.observaciones.length; index++) {
-          const element = error.response.data.observaciones[index];
-          msjError += element + '<br>&nbsp;<br>';
-        }
-        if (error.response.data.descripcionMsg != "RECIBIDO") {
-          msjError += error.response.data.descripcionMsg + '<br>&nbsp;<br>';
-        }
-        await this.prisma.facturas.update({
-          where: { id_factura: factura.id_factura },
-          data: {
-            dte_errores: msjError
+      if (error.response == undefined) {
+        msjError += "Error de conexion con el serviodr de MH, favor intentarlo nuevamente mas tarde";
+      } else {
+        console.log(error.response.data) // Mensaje de error
+        console.log(error.response.data.observaciones) // Mensaje de error
+        if (error.response.data.observaciones != null && Array.isArray(error.response.data.observaciones)) {
+          for (let index = 0; index < error.response.data.observaciones.length; index++) {
+            const element = error.response.data.observaciones[index];
+            msjError += element + '<br>&nbsp;<br>';
           }
-        });
+          if (error.response.data.descripcionMsg != "RECIBIDO") {
+            msjError += error.response.data.descripcionMsg + '<br>&nbsp;<br>';
+          }
+        }
       }
+      await this.prisma.facturas.update({
+        where: { id_factura: factura.id_factura },
+        data: {
+          dte_errores: msjError
+        }
+      });
       return msjError;
+    } finally {
+      console.timeEnd()
     }
   }
 
