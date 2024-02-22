@@ -58,9 +58,7 @@ export class UpdateSistemaDatumDto {
     @MinLength(4)
     @IsOptional()
     contactos: string;
-
-
-
+ 
     @ApiProperty({})
     @IsOptional()
     cod_estable_MH: string;
@@ -73,6 +71,20 @@ export class UpdateSistemaDatumDto {
     @ApiProperty({})
     @IsOptional()
     cod_punto_venta: string;
+
+
+
+    @ApiProperty({})
+    @IsString()
+    @MinLength(4)
+    @IsOptional()
+    icono_sistema: string;
+ 
+    @ApiProperty({})
+    @IsString()
+    @MinLength(4)
+    @IsOptional()
+    icono_factura: string;
 }
 
 

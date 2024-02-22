@@ -7,8 +7,6 @@ import { HEADER_API_BEARER_AUTH } from 'src/common/const';
 
 @Controller('facturacion/sistema_data')
 @ApiTags('Informacion de Sistema')
-@Auth()
-@ApiBearerAuth(HEADER_API_BEARER_AUTH)
 export class SistemaDataController {
   constructor(private readonly sistemaDataService: SistemaDataService) { }
 
@@ -19,11 +17,17 @@ export class SistemaDataController {
   }
 
 
+  @Auth()
+  @ApiBearerAuth(HEADER_API_BEARER_AUTH)
   @Get("obtener/actividades/economicas")
   listadoActividadesEconomicas(
   ) {
     return this.sistemaDataService.listadoActividadesEconomicas();
   }
+
+
+  @Auth()
+  @ApiBearerAuth(HEADER_API_BEARER_AUTH)
   @Put(':id')
   update(
     @Param('id', ParseIntPipe) id: number,

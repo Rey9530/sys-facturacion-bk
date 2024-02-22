@@ -582,7 +582,7 @@ export class FacturaService {
     });
 
     if (!data) throw new NotFoundException('La factura no existe');
-    const data_sistema = await this.prisma.generalData.findFirst();
+    const data_sistema = await this.prisma.generalData.findFirst({ select: { id_general: true, nombre_sistema: true, direccion: true, razon: true, nit: true, nrc: true, cod_actividad: true, desc_actividad: true, nombre_comercial: true, contactos: true, correo: true, cod_estable_MH: true, cod_estable: true, cod_punto_venta_MH: true, cod_punto_venta: true, impuesto: true, icono_sistema: true, icono_factura: true, id_tipo_contribuyente: true,} });
     return {
       data,
       data_sistema,

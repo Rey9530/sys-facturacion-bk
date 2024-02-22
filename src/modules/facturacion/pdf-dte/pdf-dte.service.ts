@@ -76,6 +76,7 @@ export class PdfDteService {
       cuerpoDocumento.push(element); 
     }
     jsonDte.cuerpoDocumento = cuerpoDocumento;
+    jsonDte.iconInvoice = dataGeneral.icono_factura;
     jsonDte.identificacion.tipoOperacion = jsonDte.identificacion.tipoOperacion == 1 ? "NORMAL" : "POR CONTINGENCIA";
     jsonDte.identificacion.tipoModelo = jsonDte.identificacion.tipoModelo == 1 ? "Modelo Facturación previo" : "Modelo de Facturación Diferido";
     jsonDte.qr = await this.generateQr("https://admin.factura.gob.sv/consultaPublica?ambiente=" + dataGeneral.ambiente + "&codGen=" + jsonDte.identificacion.codigoGeneracion + "&fechaEmi=" + jsonDte.identificacion.fecEmi);

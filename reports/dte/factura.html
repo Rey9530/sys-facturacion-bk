@@ -19,42 +19,39 @@
 </head>
 
 <body style="text-align: center;">
-    <br><br>
+    <br>
     <h6>DOCUMENTO TRIBUTARIO ELECTRÓNICO<br>{{:nombreFactura}}</h6>
     <div class="row px-4 ">
-        <div class="col-5">
-            <table>
-                <tr>
-                    <td class="small-1 p-0 m-0 text-end pe-2">Código de Generación:</td>
-                    <td class="small-1 p-0 m-0 text-start pe-2">{{:identificacion.codigoGeneracion}}</td>
-                </tr>
-                <tr>
-                    <td class="small-1 p-0 m-0 text-end pe-2">Número de Control:</td>
-                    <td class="small-1 p-0 m-0 text-start pe-2">{{:identificacion.numeroControl}}</td>
-                </tr>
-                <tr>
-                    <td class="small-1 p-0 m-0 text-end pe-2">Sello de Recepción:</td>
-                    <td class="small-1 p-0 m-0 text-start pe-2">{{:selloRecibido}}</td>
-                </tr>
-            </table>
+        <div class="col-3"> 
+            <img src="{{:iconInvoice}}" style="width:100%;" alt=""> 
         </div>
         <div class="col-2">
             <img src="{{:qr}}" style="width: 100%;" alt="">
         </div>
-        <div class="col-5">
-
+        <div class="col-4 mt-1">
+            <table>
+                <tr>
+                    <td class="small-1 p-0 m-0 text-start pe-2"><b>Código de Generación:</b>  <br>{{:identificacion.codigoGeneracion}} </td>
+                </tr>
+                <tr>
+                    <td class="small-1 p-0 m-0 text-start pe-2"> <b>Número de Control:</b> <br>{{:identificacion.numeroControl}}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="small-1 p-0 m-0 text-start pe-2"> <b>Sello de Recepción: </b> <br>{{:selloRecibido}} </td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-3 mt-1">
             <table style="width: 100%;">
                 <tr>
-                    <td class="small-1 p-0 m-0 text-end pe-2">Módelo de Facturación:</td>
-                    <td class="small-1 p-0 m-0 text-start pe-2">{{:identificacion.tipoModelo}}</td>
+                    <td class="small-1 p-0 m-0 text-start pe-2"> <b>Módelo de Facturación:</b> <br> {{:identificacion.tipoModelo}}</td>
                 </tr>
                 <tr>
-                    <td class="small-1 p-0 m-0 text-end pe-2">Tipo de Transmisión:</td>
-                    <td class="small-1 p-0 m-0 text-start pe-2">{{:identificacion.tipoOperacion}}</td>
+                    <td class="small-1 p-0 m-0 text-start pe-2"> <b>Tipo de Transmisión:</b>  <br> {{:identificacion.tipoOperacion}}</td>
                 </tr>
                 <tr>
-                    <td class="small-1 p-0 m-0 text-end pe-2">Fecha y Hora de Generación:</td>
-                    <td class="small-1 p-0 m-0 text-start pe-2">{{:identificacion.fecEmi}} {{:identificacion.horEmi}}
+                    <td class="small-1 p-0 m-0 text-start pe-2"> <b>Fecha y Hora de Generación:</b>  <br> {{:identificacion.fecEmi}} {{:identificacion.horEmi}}
                     </td>
                 </tr>
             </table>
@@ -62,44 +59,44 @@
     </div>
     <div class="row px-4  pt-2">
         <div class="col-6">
-            <p class="p-0 m-0 small-title">EMISOR</p>
+            <p class="p-0 m-0 small-title"><b>EMISOR</b> </p>
             <div class="border rounded" style="height:180px;">
                 <table style="width: 100%; ">
                     <tr>
-                        <td style="width: 35%;" class="small-1 p-0 m-0 text-end pe-2">Nombre o razón social:</td>
+                        <td style="width: 35%;" class="small-1 p-0 m-0 text-end pe-2"><b>Nombre o razón social:</b></td>
                         <td style="width: 65%;" class="small-1 p-0 m-0 text-start pe-2">{{:emisor.nombre}}
                         </td>
                     </tr>
                     <tr>
-                        <td class="small-1 p-0 m-0 text-end pe-2">NIT:</td>
+                        <td class="small-1 p-0 m-0 text-end pe-2 fw-bold">NIT:</td>
                         <td class="small-1 p-0 m-0 text-start pe-2">{{:emisor.nit}}</td>
                     </tr>
                     <tr>
-                        <td class="small-1 p-0 m-0 text-end pe-2">NRC:</td>
+                        <td class="small-1 p-0 m-0 text-end pe-2 fw-bold">NRC:</td>
                         <td class="small-1 p-0 m-0 text-start pe-2">{{:emisor.nrc}}</td>
                     </tr>
                     <tr>
-                        <td class="small-1 p-0 m-0 text-end pe-2">Actividad económica:</td>
+                        <td class="small-1 p-0 m-0 text-end pe-2 fw-bold">Actividad económica:</td>
                         <td class="small-1 p-0 m-0 text-start pe-2">{{:emisor.descActividad}}</td>
                     </tr>
                     <tr>
-                        <td class="small-1 p-0 m-0 text-end pe-2">Dirección:</td>
+                        <td class="small-1 p-0 m-0 text-end pe-2 fw-bold">Dirección:</td>
                         <td class="small-1 p-0 m-0 text-start pe-2">{{:emisor.direccion}}</td>
                     </tr>
                     <tr>
-                        <td class="small-1 p-0 m-0 text-end pe-2">Número de teléfono:</td>
+                        <td class="small-1 p-0 m-0 text-end pe-2 fw-bold">Número de teléfono:</td>
                         <td class="small-1 p-0 m-0 text-start pe-2">{{:emisor.telefono}}</td>
                     </tr>
                     <tr>
-                        <td class="small-1 p-0 m-0 text-end pe-2">Correo electrónico:</td>
+                        <td class="small-1 p-0 m-0 text-end pe-2 fw-bold">Correo electrónico:</td>
                         <td class="small-1 p-0 m-0 text-start pe-2">{{:emisor.correo}}</td>
                     </tr>
                     <tr>
-                        <td class="small-1 p-0 m-0 text-end pe-2">Nombre Comercial:</td>
+                        <td class="small-1 p-0 m-0 text-end pe-2 fw-bold">Nombre Comercial:</td>
                         <td class="small-1 p-0 m-0 text-start pe-2">{{:emisor.nombreComercial}}</td>
                     </tr>
                     <tr>
-                        <td class="small-1 p-0 m-0 text-end pe-2">Tipo de establecimiento:</td>
+                        <td class="small-1 p-0 m-0 text-end pe-2 fw-bold">Tipo de establecimiento:</td>
                         <td class="small-1 p-0 m-0 text-start pe-2">{{:emisor.tipoEstablecimiento}}</td>
                     </tr>
                 </table>
@@ -107,12 +104,12 @@
         </div>
 
         <div class=" col-6  ">
-            <p class="p-0 m-0 small-title">RECEPTOR</p>
+            <p class="p-0 m-0 small-title  fw-bold">RECEPTOR</p>
             <div class="border rounded" style="height:180px;">
                 <table style="width: 100%;">
                     {{if receptor.nombre}}
                     <tr>
-                        <td style="width: 50%;" class="small-1 p-0 m-0 text-end pe-2">Nombre o razón socia:</td>
+                        <td style="width: 50%;" class="small-1 p-0 m-0 text-end pe-2  fw-bold">Nombre o razón socia:</td>
                         <td style="width: 50%;" class="small-1 p-0 m-0 text-start pe-2">{{:receptor.nombre}}</td>
                     </tr>
                     {{else}}
@@ -121,7 +118,7 @@
 
                     {{if identificacion.tipoDte=='01'}}
                     <tr>
-                        <td class="small-1 p-0 m-0 text-end pe-2">Tipo de doc. de Identificación:</td>
+                        <td class="small-1 p-0 m-0 text-end pe-2 fw-bold">Tipo de doc. de Identificación:</td>
                         <td class="small-1 p-0 m-0 text-start pe-2">
                             {{if receptor.tipoDocumento}}
                             {{:receptor.tipoDocumento}}
@@ -134,7 +131,7 @@
                     
                     {{if identificacion.tipoDte=='01'}}
                     <tr>
-                        <td class="small-1 p-0 m-0 text-end pe-2">N° de doc. de Identificación:</td>
+                        <td class="small-1 p-0 m-0 text-end pe-2 fw-bold">N° de doc. de Identificación:</td>
                         <td class="small-1 p-0 m-0 text-start pe-2">
                             {{if receptor.numDocumento}}
                             {{:receptor.numDocumento}}
@@ -148,7 +145,7 @@
                     {{if identificacion.tipoDte=='02'}}
 
                     <tr>
-                        <td class="small-1 p-0 m-0 text-end pe-2">NIT:</td>
+                        <td class="small-1 p-0 m-0 text-end pe-2 fw-bold">NIT:</td>
                         <td class="small-1 p-0 m-0 text-start pe-2">
                             {{if receptor.nit}}
                             {{:receptor.nit}}
@@ -160,7 +157,7 @@
                     {{/if}} 
 
                     <tr>
-                        <td class="small-1 p-0 m-0 text-end pe-2">Actividad económica:</td>
+                        <td class="small-1 p-0 m-0 text-end pe-2 fw-bold">Actividad económica:</td>
                         <td class="small-1 p-0 m-0 text-start pe-2">
 
                             {{if receptor.descActividad}}
@@ -171,7 +168,7 @@
                     </tr>
 
                     <tr>
-                        <td class="small-1 p-0 m-0 text-end pe-2">Correo Electrónico:</td>
+                        <td class="small-1 p-0 m-0 text-end pe-2 fw-bold">Correo Electrónico:</td>
                         <td class="small-1 p-0 m-0 text-start pe-2">
 
                             {{if receptor.correo}}
@@ -182,7 +179,7 @@
                     </tr>
 
                     <tr>
-                        <td class="small-1 p-0 m-0 text-end pe-2">Nombre Comercial:</td>
+                        <td class="small-1 p-0 m-0 text-end pe-2 fw-bold">Nombre Comercial:</td>
                         <td class="small-1 p-0 m-0 text-start pe-2">
 
                             {{if receptor.nombreComercial}}
@@ -198,14 +195,14 @@
     </div>
     <div class="row px-4 pt-2">
         <div class="col-12">
-            <p class="p-0 m-0 small-title">VENTA A CUENTA DE TERCEROS</p>
+            <p class="p-0 m-0 small-title fw-bold">VENTA A CUENTA DE TERCEROS</p>
             <div class="border rounded">
                 <table style="width: 100%;">
-                    <td style="width: 15%;" class="small-1 p-0 m-0 text-start pe-2 ps-2">NIT:</td>
-                    <td style="width: 25%;" class="small-1 p-0 m-0 text-end pe-2"></td>
-                    <td style="width: 35%;" class="small-1 p-0 m-0 text-end pe-2">Nombre, denominación o razón social:
+                    <td style="width: 15%;" class=" fw-bold small-1 p-0 m-0 text-start pe-2 ps-2">NIT:</td>
+                    <td style="width: 25%;" class=" fw-bold small-1 p-0 m-0 text-end pe-2"></td>
+                    <td style="width: 35%;" class=" fw-bold small-1 p-0 m-0 text-end pe-2">Nombre, denominación o razón social:
                     </td>
-                    <td style="width: 25%;" class="small-1 p-0 m-0 text-end pe-2"></td>
+                    <td style="width: 25%;" class=" small-1 p-0 m-0 text-end pe-2"></td>
                 </table>
             </div>
         </div>
@@ -215,12 +212,12 @@
             <p class="p-0 m-0 small-title">DOCUMENTOS RELACIONADOS</p>
             <div class="border rounded">
                 <table style="width: 100%;">
-                    <td style="width: auto;" class="small-1 p-0 m-0 text-start pe-2 ps-2">Tipo de Documento:</td>
-                    <td style="width: auto;" class="small-1 p-0 m-0 text-end pe-2"></td>
-                    <td style="width: auto;" class="small-1 p-0 m-0 text-end pe-2">N° de documento:</td>
-                    <td style="width: auto;" class="small-1 p-0 m-0 text-end pe-2"></td>
-                    <td style="width: auto;" class="small-1 p-0 m-0 text-end pe-2">Fecha del Documento:</td>
-                    <td style="width: auto;" class="small-1 p-0 m-0 text-end pe-2"></td>
+                    <td style="width: auto;" class=" fw-bold small-1 p-0 m-0 text-start pe-2 ps-2">Tipo de Documento:</td>
+                    <td style="width: auto;" class=" fw-bold small-1 p-0 m-0 text-end pe-2"></td>
+                    <td style="width: auto;" class=" fw-bold small-1 p-0 m-0 text-end pe-2">N° de documento:</td>
+                    <td style="width: auto;" class=" fw-bold small-1 p-0 m-0 text-end pe-2"></td>
+                    <td style="width: auto;" class=" fw-bold small-1 p-0 m-0 text-end pe-2">Fecha del Documento:</td>
+                    <td style="width: auto;" class=" fw-bold small-1 p-0 m-0 text-end pe-2"></td>
                 </table>
             </div>
         </div>
@@ -230,10 +227,10 @@
             <p class="p-0 m-0 small-title">OTROS DOCUMENTOS ASOCIADO</p>
             <div class="border rounded">
                 <table style="width: 100%;">
-                    <td style="width: 25%;" class="small-1 p-0 m-0 text-start pe-2 ps-2">Identificación documento:</td>
-                    <td style="width: 25%;" class="small-1 p-0 m-0 text-end pe-2"></td>
-                    <td style="width: 25%;" class="small-1 p-0 m-0 text-end pe-2">Descripción:</td>
-                    <td style="width: 25%;" class="small-1 p-0 m-0 text-end pe-2"></td>
+                    <td style="width: 25%;" class=" fw-bold small-1 p-0 m-0 text-start pe-2 ps-2">Identificación documento:</td>
+                    <td style="width: 25%;" class=" fw-bold small-1 p-0 m-0 text-end pe-2"></td>
+                    <td style="width: 25%;" class=" fw-bold small-1 p-0 m-0 text-end pe-2">Descripción:</td>
+                    <td style="width: 25%;" class=" fw-bold small-1 p-0 m-0 text-end pe-2"></td>
                 </table>
             </div>
         </div>
@@ -274,31 +271,31 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td class="small-1 p-0 m-0 text-end" colspan="7">Suma de Ventas:</td>
+                        <td class="small-1 p-0 m-0 text-end fw-bold" colspan="7">Suma de Ventas:</td>
                         <td class="small-1 p-0 m-0 text-end">{{:resumen.totalNoSuj}}</td>
                         <td class="small-1 p-0 m-0 text-end">{{:resumen.totalExenta}}</td>
                         <td class="small-1 p-0 m-0 text-end">{{:resumen.totalGravada}}</td>
                     </tr>
                     <tr>
                         <td class="small-1 p-0 m-0 text-end" colspan="5"></td>
-                        <td class="small-1 p-0 m-0 text-end" colspan="4">Sumatoria de ventas</td>
+                        <td class="small-1 p-0 m-0 text-end fw-bold" colspan="4">Sumatoria de ventas</td>
                         <td class="small-1 p-0 m-0 text-end">{{:resumen.subTotalVentas}}</td>
                     </tr>
                     <tr>
                         <td class="small-1 p-0 m-0 text-end" colspan="5"></td>
-                        <td class="small-1 p-0 m-0 text-end" colspan="4">Monto global Desc., Rebajas y otros a ventas no
+                        <td class="small-1 p-0 m-0 text-end fw-bold" colspan="4">Monto global Desc., Rebajas y otros a ventas no
                             sujetas:</td>
                         <td class="small-1 p-0 m-0 text-end">{{:resumen.descuNoSuj}}</td>
                     </tr>
                     <tr>
                         <td class="small-1 p-0 m-0 text-end" colspan="5"></td>
-                        <td class="small-1 p-0 m-0 text-end" colspan="4">Monto global Desc., Rebajas y otros a ventas
+                        <td class="small-1 p-0 m-0 text-end fw-bold" colspan="4">Monto global Desc., Rebajas y otros a ventas
                             exentas:</td>
                         <td class="small-1 p-0 m-0 text-end">{{:resumen.descuExenta}}</td>
                     </tr>
                     <tr>
                         <td class="small-1 p-0 m-0 text-end" colspan="5"></td>
-                        <td class="small-1 p-0 m-0 text-end" colspan="4">Monto global Desc., Rebajas y otros a ventas
+                        <td class="small-1 p-0 m-0 text-end fw-bold" colspan="4">Monto global Desc., Rebajas y otros a ventas
                             gravada:</td>
                         <td class="small-1 p-0 m-0 text-end">{{:resumen.descuGravada}}</td>
                     </tr>
@@ -317,32 +314,32 @@
                     {{/if}}
                     <tr>
                         <td class="small-1 p-0 m-0 text-end" colspan="5"></td>
-                        <td class="small-1 p-0 m-0 text-end" colspan="4">Sub-Total:</td>
+                        <td class="small-1 p-0 m-0 text-end  fw-bold" colspan="4">Sub-Total:</td>
                         <td class="small-1 p-0 m-0 text-end">{{:resumen.subTotal}}</td>
                     </tr>
                     <tr>
                         <td class="small-1 p-0 m-0 text-end" colspan="5"></td>
-                        <td class="small-1 p-0 m-0 text-end" colspan="4">IVA Retenido:</td>
+                        <td class="small-1 p-0 m-0 text-end fw-bold" colspan="4">IVA Retenido:</td>
                         <td class="small-1 p-0 m-0 text-end">{{:resumen.ivaRete1}}</td>
                     </tr>
                     <tr>
                         <td class="small-1 p-0 m-0 text-end" colspan="5"></td>
-                        <td class="small-1 p-0 m-0 text-end" colspan="4">Retención Renta:</td>
+                        <td class="small-1 p-0 m-0 text-end fw-bold" colspan="4">Retención Renta:</td>
                         <td class="small-1 p-0 m-0 text-end">{{:resumen.reteRenta}}</td>
                     </tr>
                     <tr>
                         <td class="small-1 p-0 m-0 text-end" colspan="5"></td>
-                        <td class="small-1 p-0 m-0 text-end" colspan="4">Monto Total de la Operación:</td>
+                        <td class="small-1 p-0 m-0 text-end fw-bold" colspan="4">Monto Total de la Operación:</td>
                         <td class="small-1 p-0 m-0 text-end">{{:resumen.montoTotalOperacion}}</td>
                     </tr>
                     <tr>
                         <td class="small-1 p-0 m-0 text-end" colspan="5"></td>
-                        <td class="small-1 p-0 m-0 text-end" colspan="4">Total Otros Montos No Afectos:</td>
+                        <td class="small-1 p-0 m-0 text-end fw-bold" colspan="4">Total Otros Montos No Afectos:</td>
                         <td class="small-1 p-0 m-0 text-end">{{:resumen.totalNoGravado}}</td>
                     </tr>
                     <tr>
                         <td class="small-1 p-0 m-0 text-end" colspan="5"></td>
-                        <td class="small-1 p-0 m-0 text-end" colspan="4">Total a Pagar:</td>
+                        <td class="small-1 p-0 m-0 text-end fw-bold" colspan="4">Total a Pagar:</td>
                         <td class="small-1 p-0 m-0 text-end">{{:resumen.totalPagar}}</td>
                     </tr>
                 </tfoot>
@@ -355,13 +352,13 @@
             <div class="border rounded">
                 <table style="width: 100%;">
                     <tr>
-                        <td style="width: 10%;" class="small-1 p-0 m-0 text-start pe-2 ps-2">Valor en Letras:</td>
+                        <td style="width: 10%;" class=" fw-bold small-1 p-0 m-0 text-start pe-2 ps-2">Valor en Letras:</td>
                         <td style="width: 40%;" class="small-1 p-0 m-0 text-start pe-2">{{:resumen.totalLetras}}</td>
-                        <td style="width: 25%;" class="small-1 p-0 m-0 text-end pe-2">Condición de la Operación:</td>
+                        <td style="width: 25%;" class=" fw-bold small-1 p-0 m-0 text-end pe-2">Condición de la Operación:</td>
                         <td style="width: 25%;" class="small-1 p-0 m-0 text-end pe-2">Contado</td>
                     </tr>
                     <tr>
-                        <td style="width: 25%;" class="small-1 p-0 m-0 text-start pe-2 ps-2">Observaciones:</td>
+                        <td style="width: 25%;" class=" fw-bold small-1 p-0 m-0 text-start pe-2 ps-2">Observaciones:</td>
                         <td style="width: 25%;" class="small-1 p-0 m-0 text-end pe-2"></td>
                         <td style="width: 25%;" class="small-1 p-0 m-0 text-end pe-2"></td>
                         <td style="width: 25%;" class="small-1 p-0 m-0 text-end pe-2"></td>
@@ -376,17 +373,17 @@
             <div class="border rounded">
                 <table style="width: 100%;">
                     <tr>
-                        <td style="width: 25%;" class="small-1 p-0 m-0 text-start pe-2 ps-2">Responsable por parte del
+                        <td style="width: 25%;" class=" fw-bold small-1 p-0 m-0 text-start pe-2 ps-2">Responsable por parte del
                             Emiso:</td>
                         <td style="width: 25%;" class="small-1 p-0 m-0 text-end pe-2"></td>
-                        <td style="width: 25%;" class="small-1 p-0 m-0 text-end pe-2">N° de Documento:</td>
+                        <td style="width: 25%;" class=" fw-bold small-1 p-0 m-0 text-end pe-2">N° de Documento:</td>
                         <td style="width: 25%;" class="small-1 p-0 m-0 text-end pe-2"></td>
                     </tr>
                     <tr>
-                        <td style="width: 25%;" class="small-1 p-0 m-0 text-start pe-2 ps-2">Responsable por parte del
+                        <td style="width: 25%;" class=" fw-bold small-1 p-0 m-0 text-start pe-2 ps-2">Responsable por parte del
                             Recepto:</td>
                         <td style="width: 25%;" class="small-1 p-0 m-0 text-end pe-2"></td>
-                        <td style="width: 25%;" class="small-1 p-0 m-0 text-end pe-2">N° de Documento:</td>
+                        <td style="width: 25%;" class=" fw-bold small-1 p-0 m-0 text-end pe-2">N° de Documento:</td>
                         <td style="width: 25%;" class="small-1 p-0 m-0 text-end pe-2"></td>
                     </tr>
                 </table>

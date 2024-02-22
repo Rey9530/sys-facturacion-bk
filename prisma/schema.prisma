@@ -79,6 +79,8 @@ model GeneralData {
   sender_email          String?       @default("")
   domain_email          String?       @default("")
   impuesto              Float?        @default(0.13)
+  icono_sistema         String?       @default("") @db.Text
+  icono_factura         String?       @default("") @db.Text
   id_tipo_contribuyente Int?
   TipoCliente           TiposCliente? @relation(fields: [id_tipo_contribuyente], references: [id_tipo_cliente], onDelete: NoAction, onUpdate: NoAction, map: "fk_sistema_tipo")
 

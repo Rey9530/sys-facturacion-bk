@@ -31,7 +31,7 @@ export class AuthService {
     if (!validarPass) throw new NotFoundException('El email o clave no existe');
     try {
       const token = await this.getJwtToken({ id: usaurioDB.id, id_sucursal: usaurioDB.id_sucursal });
-      const dataGeneral = await this.prisma.generalData.findFirst();
+      const dataGeneral = await this.prisma.generalData.findFirst({ select: { id_general: true, nombre_sistema: true, direccion: true, razon: true, nit: true, nrc: true, cod_actividad: true, desc_actividad: true, nombre_comercial: true, contactos: true, correo: true, cod_estable_MH: true, cod_estable: true, cod_punto_venta_MH: true, cod_punto_venta: true, impuesto: true, icono_sistema: true, icono_factura: true, id_tipo_contribuyente: true,} });
       dataGeneral!.id_general = 0;
       return { ...usaurioDB, token, ...dataGeneral }
     } catch (error) {
@@ -51,7 +51,7 @@ export class AuthService {
     if (!usaurioDB) throw new NotFoundException('Error al renovar el Token');
     // const token = await getenerarJWT(uid, usaurioDB?.id_sucursal);
     const token = await this.getJwtToken({ id: usaurioDB.id, id_sucursal: usaurioDB.id_sucursal });
-    const dataGeneral = await this.prisma.generalData.findFirst();
+    const dataGeneral = await this.prisma.generalData.findFirst({ select: { id_general: true, nombre_sistema: true, direccion: true, razon: true, nit: true, nrc: true, cod_actividad: true, desc_actividad: true, nombre_comercial: true, contactos: true, correo: true, cod_estable_MH: true, cod_estable: true, cod_punto_venta_MH: true, cod_punto_venta: true, impuesto: true, icono_sistema: true, icono_factura: true, id_tipo_contribuyente: true,} });
     dataGeneral!.id_general = 0;
     return { ...usaurioDB, token, ...dataGeneral };
   }

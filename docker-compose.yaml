@@ -1,0 +1,37 @@
+version: '3.9'
+
+services:
+  sys-facturacion:
+    depends_on:
+      - db-facturacion
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: nestjs-docker
+    # image: localhost/marcacion-backend
+    #container_name: nestjsapp
+    restart: always # reiniciar el contenedor si se detiene
+    ports:
+      - "${PORT}:${PORT}"
+    env_file: .env
+    networks:
+      - network-facturacion
+
+
+  db-facturacion:
+    image: postgres:15.2-alpine
+    container_name: ${DB_HOST}
+    restart: always
+    ports:
+      - 5454:5432
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
+      TZ: 'America/El_Salvador'
+      PGTZ: 'America/El_Salvador'
+    networks:
+      - network-facturacion
+
+networks:
+  network-facturacion: 
