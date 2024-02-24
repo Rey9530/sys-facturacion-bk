@@ -1,12 +1,13 @@
 version: '3.9'
 
 services:
-  sys-facturacion:
+  fac-app:
     depends_on:
-      - db-facturacion
+      - fac-db
     build:
       context: .
       dockerfile: Dockerfile
+    privileged: true
     image: nestjs-docker
     # image: localhost/marcacion-backend
     #container_name: nestjsapp
@@ -15,15 +16,14 @@ services:
       - "${PORT}:${PORT}"
     env_file: .env
     networks:
-      - network-facturacion
+      - network-fac
 
-
-  db-facturacion:
+  fac-db:
     image: postgres:15.2-alpine
     container_name: ${DB_HOST}
     restart: always
     ports:
-      - 5454:5432
+      - 5453:5432
     environment:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
@@ -31,7 +31,8 @@ services:
       TZ: 'America/El_Salvador'
       PGTZ: 'America/El_Salvador'
     networks:
-      - network-facturacion
+      - network-fac
 
 networks:
-  network-facturacion: 
+  network-fac:
+    external: true
