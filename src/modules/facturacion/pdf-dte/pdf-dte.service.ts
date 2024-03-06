@@ -29,11 +29,34 @@ export class PdfDteService {
         }
       })
       .then(() => {
-        console.log('JsReport initialized successfully');
       })
       .catch((err) => {
         console.error('Error initializing JsReport', err);
       });
+  }
+
+  async generatePdf(id_factura) {
+
+    const factura_s = await this.prisma.facturas.findFirst({
+      where: { id_factura },
+      include: {
+        FacturasDetalle: true,
+        Sucursal: { include: { DTETipoEstablecimiento: true, Municipio: { include: { Departamento: true } } } },
+        Bloque: {
+          include: {
+            Tipo: true,
+          },
+        },
+        Cliente: {
+          include: {
+            Municipio: { include: { Departamento: true } },
+            DTEActividadEconomica: true,
+            DTETipoDocumentoIdentificacion: true,
+          }
+        }
+      },
+    });
+    return await this.generatePdfFactura(factura_s);
   }
 
   async generatePdfFactura(factura_s: any): Promise<Buffer> {
@@ -71,9 +94,9 @@ export class PdfDteService {
       element.ventaNoSuj = formatNumber(element.ventaNoSuj)
       element.ventaExenta = formatNumber(element.ventaExenta)
       element.ventaGravada = formatNumber(element.ventaGravada)
-      element.noGravado = formatNumber(element.noGravado)  
+      element.noGravado = formatNumber(element.noGravado)
       element.ivaItem = formatNumber(element.ivaItem)
-      cuerpoDocumento.push(element); 
+      cuerpoDocumento.push(element);
     }
     jsonDte.cuerpoDocumento = cuerpoDocumento;
     jsonDte.iconInvoice = dataGeneral.icono_factura;
@@ -111,8 +134,6 @@ export class PdfDteService {
         }
       },
     });
-
-    // await fs.writeFileSync(path.join(process.cwd(), 'reports/pdf-temp/DTE-01-M001P001-000010000000021.pdf'), result.content);
     return result.content.toString('base64');
   }
 

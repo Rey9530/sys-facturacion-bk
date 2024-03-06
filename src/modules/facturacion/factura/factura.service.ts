@@ -370,16 +370,25 @@ export class FacturaService {
       throw new NotFoundException('El parametro no es valido');
     }
     let arrayQuery = query.split(' ');
-    const data = await this.prisma.catalogo.findMany({
+    let arrayName: any = arrayQuery.map((contains: any) => {
+      return {
+        nombre: {
+          contains,
+          mode: 'insensitive',
+        },
+      };
+    });
+    let arrayCode: any = arrayQuery.map((contains: any) => {
+      return {
+        codigo: {
+          contains,
+          mode: 'insensitive',
+        },
+      };
+    }); 
+    let data = await this.prisma.catalogo.findMany({
       where: {
-        OR: arrayQuery.map((contains: any) => {
-          return {
-            nombre: {
-              contains,
-              mode: 'insensitive',
-            },
-          };
-        }),
+        OR: [{ OR: [...arrayName] }, { OR: [...arrayCode] }],
         estado: 'ACTIVO',
       },
       include: {
@@ -392,6 +401,10 @@ export class FacturaService {
         },
       },
     });
+    data = data.map(e => {
+      e.nombre = `${e.nombre} (${e.codigo})`
+      return e;
+    })
     return data;
   }
   async cierreManual(dataDto: CierreManualTDO, user: Usuarios) {
@@ -582,7 +595,7 @@ export class FacturaService {
     });
 
     if (!data) throw new NotFoundException('La factura no existe');
-    const data_sistema = await this.prisma.generalData.findFirst({ select: { id_general: true, nombre_sistema: true, direccion: true, razon: true, nit: true, nrc: true, cod_actividad: true, desc_actividad: true, nombre_comercial: true, contactos: true, correo: true, cod_estable_MH: true, cod_estable: true, cod_punto_venta_MH: true, cod_punto_venta: true, impuesto: true, icono_sistema: true, icono_factura: true, id_tipo_contribuyente: true,} });
+    const data_sistema = await this.prisma.generalData.findFirst({ select: { id_general: true, nombre_sistema: true, direccion: true, razon: true, nit: true, nrc: true, cod_actividad: true, desc_actividad: true, nombre_comercial: true, contactos: true, correo: true, cod_estable_MH: true, cod_estable: true, cod_punto_venta_MH: true, cod_punto_venta: true, impuesto: true, icono_sistema: true, icono_factura: true, id_tipo_contribuyente: true, } });
     return {
       data,
       data_sistema,

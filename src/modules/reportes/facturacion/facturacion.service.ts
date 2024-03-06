@@ -46,6 +46,7 @@ export class FacturacionService {
         await this.prisma.facturas.findFirst({
           where: {
             ...fecha_creacio,
+            dte_procesado:true,
             Bloque: { Tipo: { id_tipo_factura: 1 } },
             id_sucursal
           },
@@ -53,6 +54,7 @@ export class FacturacionService {
         await this.prisma.facturas.findFirst({
           where: {
             ...fecha_creacio,
+            dte_procesado:true,
             Bloque: { Tipo: { id_tipo_factura: 1 } },
             id_sucursal
           },
@@ -63,6 +65,7 @@ export class FacturacionService {
         await this.prisma.facturas.findMany({
           where: {
             ...fecha_creacio,
+            dte_procesado:true,
             Bloque: { Tipo: { id_tipo_factura: 1 } },
             id_sucursal
           },
@@ -117,6 +120,7 @@ export class FacturacionService {
           gte: desde,
           lte: hasta,
         },
+        dte_procesado:true,
         Bloque: { Tipo: { id_tipo_factura: 2 } },
         id_sucursal
       },

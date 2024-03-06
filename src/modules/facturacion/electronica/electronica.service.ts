@@ -7,7 +7,7 @@ import { v5 as uuidv5, v4 as uuidv4 } from 'uuid';
 import { format } from 'date-fns';
 import * as jwt from 'jsonwebtoken';
 import { SendEmailsService } from 'src/modules/send-emails/send-emails.service';
-import { convertirCantidadADolaresYCentavos, eliminarGuionesYEspacios, verifyEmail } from 'src/common/helpers';
+import { NumeroALetras,  eliminarGuionesYEspacios, verifyEmail } from 'src/common/helpers';
 import { TIMEOUTAXIOS } from 'src/common/const/directory';
 import e from 'express';
 
@@ -247,7 +247,7 @@ export class ElectronicaService {
         "reteRenta": 0,
         "montoTotalOperacion": factura.total,
         "totalPagar": factura.total,
-        "totalLetras": convertirCantidadADolaresYCentavos(Number(factura.total.toFixed(2)).toString()).toUpperCase(),
+        "totalLetras": NumeroALetras(parseFloat(factura.total.toFixed(2))).toUpperCase(),
         "totalIva": factura.iva,
         "saldoFavor": 0,
         "condicionOperacion": 1,
@@ -810,7 +810,7 @@ export class ElectronicaService {
         "montoTotalOperacion": factura.total,
         "totalNoGravado": 0,
         "totalPagar": factura.total,
-        "totalLetras": convertirCantidadADolaresYCentavos(Number(factura.total.toFixed(2)).toString()).toUpperCase(),
+        "totalLetras": NumeroALetras(parseFloat(factura.total.toFixed(2))).toUpperCase(),
         "saldoFavor": 0,
         "condicionOperacion": 1,
         "pagos": null,

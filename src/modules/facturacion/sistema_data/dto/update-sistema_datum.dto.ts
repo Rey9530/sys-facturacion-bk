@@ -8,11 +8,11 @@ export class UpdateSistemaDatumDto {
     nombre_sistema: string;
 
     @ApiProperty({})
-    @IsPositive()
+    @IsString()
     impuesto: number;
 
     @ApiProperty({})
-    @IsInt()
+    @IsString()
     @IsOptional()
     id_tipo_contribuyente: number;
 
@@ -22,7 +22,7 @@ export class UpdateSistemaDatumDto {
     nombre_comercial: string;
 
     @ApiProperty({})
-    @IsPositive()
+    @IsString()
     id_actividad_economica: number;
 
     @ApiProperty({})
@@ -71,20 +71,7 @@ export class UpdateSistemaDatumDto {
     @ApiProperty({})
     @IsOptional()
     cod_punto_venta: string;
-
-
-
-    @ApiProperty({})
-    @IsString()
-    @MinLength(4)
-    @IsOptional()
-    icono_sistema: string;
  
-    @ApiProperty({})
-    @IsString()
-    @MinLength(4)
-    @IsOptional()
-    icono_factura: string;
 }
 
 

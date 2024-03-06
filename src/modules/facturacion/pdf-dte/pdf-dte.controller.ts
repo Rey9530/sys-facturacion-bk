@@ -1,18 +1,20 @@
-import { Controller, Get, Res } from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe, } from '@nestjs/common';
 import { PdfDteService } from './pdf-dte.service';
-import { Response } from 'express';
-import * as fs from 'fs';
-import * as path from 'path';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Auth } from 'src/modules/auth/decorators';
+import { HEADER_API_BEARER_AUTH } from 'src/common/const';
 
 @Controller('pdf-dte')
+@ApiTags('Generacion PDFs de facturas')
+@Auth()
+@ApiBearerAuth(HEADER_API_BEARER_AUTH)
 export class PdfDteController {
     constructor(private readonly pdfDteService: PdfDteService) { }
 
-    @Get('generate-pdf')
-    async generatePdf(@Res() res: Response) {
-        const pdfBuffer = await this.pdfDteService.generatePdfFactura(62);
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', 'attachment; filename=report.pdf');
-        res.end(pdfBuffer);
+    @Get('generate-pdf/:id')
+    async generatePdf(
+        @Param('id', ParseIntPipe) id: number,
+    ) {
+        return await this.pdfDteService.generatePdf(id);
     }
 }
