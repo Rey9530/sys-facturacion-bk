@@ -150,4 +150,16 @@ export class FacturaController {
       motiveInvalidation,
     );
   }
+
+
+  @Delete('anular_factura_sin_dte/:id')
+  removeSinDTE(
+    @Param('id', ParseIntPipe) id: number, 
+    @GetUser() user: Usuarios,
+  ) {
+    return this.facturaService.removeSinDTE(
+      id,
+      user, 
+    );
+  }
 }

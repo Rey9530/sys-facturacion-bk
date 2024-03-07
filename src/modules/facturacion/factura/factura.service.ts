@@ -716,6 +716,22 @@ export class FacturaService {
     });
     return resp;
   }
+  async removeSinDTE(
+    id_factura: number,
+    user: Usuarios, 
+  ) {
+    let id_sucursal = Number(user.id_sucursal);
+    const data = await this.prisma.facturas.findMany({
+      where: { estado: 'ACTIVO', id_factura, id_sucursal },
+    });
+
+    if (!data) throw new NotFoundException('La factura no existe'); 
+    await this.prisma.facturas.update({
+      where: { id_factura },
+      data: { estado: 'ANULADA' },
+    });
+    return data;
+  }
 
   async descargarItemDeInventario(item: any, nomero_factura: any = 0) {
     if (item.item != null && item.item.Inventario.length > 0) {

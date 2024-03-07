@@ -57,11 +57,12 @@ export class ComprasService {
     var hasta: any = params.hasta!.toString();
     desde = new Date(desde);
     hasta = new Date(hasta);
-    hasta.setDate(hasta.getDate() + 1);
-
+    hasta.setHours(hasta.getHours() + 23);
+    hasta.setMinutes(hasta.getMinutes() + 59);
+    hasta.setSeconds(hasta.getSeconds() + 59);  
     const data = await this.prisma.compras.findMany({
       where: {
-        fecha_creacion: {
+        fecha_factura: {
           gte: desde,
           lte: hasta,
         },
@@ -81,11 +82,13 @@ export class ComprasService {
     var hasta: any = params.hasta!.toString();
     desde = new Date(desde);
     hasta = new Date(hasta);
-    hasta.setDate(hasta.getDate() + 1);
+    hasta.setHours(hasta.getHours() + 23);
+    hasta.setMinutes(hasta.getMinutes() + 59);
+    hasta.setSeconds(hasta.getSeconds() + 59); 
 
     const data = await this.prisma.compras.findMany({
       where: {
-        fecha_creacion: {
+        fecha_factura: {
           gte: desde,
           lte: hasta,
         },
