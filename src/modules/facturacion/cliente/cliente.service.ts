@@ -23,6 +23,7 @@ export class ClienteService {
       nit = '',
       id_municipio = 0,
       id_tipo_cliente = 0,
+      id_pais = 0,
       id_tipo_documento = 0,
       id_actividad_economica = 0,
       direccion = '',
@@ -82,6 +83,16 @@ export class ClienteService {
     } else {
       id_municipio = null;
     }
+    id_pais = Number(id_pais);
+    if (id_pais > 0) {
+      const municipio = await this.prisma.dTEPais.findFirst({
+        where: { id_pais },
+      });
+      if (!municipio)
+        throw new NotFoundException('El municipio seleccionado no existe');
+    } else {
+      id_pais = null;
+    }
     try {
       const data = await this.prisma.cliente.create({
         data: {
@@ -100,7 +111,8 @@ export class ClienteService {
           id_sucursal,
           id_tipo_cliente,
           id_tipo_documento,
-          id_actividad_economica
+          id_actividad_economica,
+          id_pais
         },
         select: {
           id_cliente: true,
@@ -197,6 +209,29 @@ export class ClienteService {
       where: { estado: 'ACTIVO' },
     });
   }
+  async getAllCountry() {
+    return await this.prisma.dTEPais.findMany({ orderBy: { valor: 'asc' } });
+  }
+  async getCatalog() {
+    const [departaments, tiposCliente, tiposIdentificacion, actividadEconomica, paises] = await Promise.all([
+      await this.prisma.departamentos.findMany({
+        where: { estado: 'ACTIVO' },
+      }),
+      await this.prisma.tiposCliente.findMany({
+        where: { estado: 'ACTIVO' },
+      }),
+      await this.prisma.dTETipoDocumentoIdentificacion.findMany({
+        where: { estado: 'ACTIVO' },
+      }),
+      await this.prisma.dTEActividadEconomica.findMany({
+        where: { estado: 'ACTIVO' },
+        orderBy: { nombre: 'asc' }
+      }),
+      await this.prisma.dTEPais.findMany()
+    ]);
+
+    return { departaments, tiposCliente, tiposIdentificacion, actividadEconomica, paises }
+  }
   async findOneInvoice(uid: number) {
     uid = uid > 0 ? uid : 0;
     const registros = await this.prisma.cliente.findFirst({
@@ -223,6 +258,7 @@ export class ClienteService {
       id_tipo_cliente = 0,
       id_tipo_documento = 0,
       id_actividad_economica = 0,
+      id_pais = 0,
       direccion = '',
       telefono = '',
       correo = '',
@@ -297,6 +333,17 @@ export class ClienteService {
     } else {
       id_municipio = null;
     }
+
+    id_pais = Number(id_pais);
+    if (id_pais > 0) {
+      const municipio = await this.prisma.dTEPais.findFirst({
+        where: { id_pais },
+      });
+      if (!municipio)
+        throw new NotFoundException('El municipio seleccionado no existe');
+    } else {
+      id_pais = null;
+    }
     try {
       const registroActualizado = await this.prisma.cliente.update({
         where: { id_cliente: uid },
@@ -315,7 +362,8 @@ export class ClienteService {
           dui,
           id_tipo_cliente,
           id_tipo_documento,
-          id_actividad_economica
+          id_actividad_economica,
+          id_pais
         },
         select: {
           id_cliente: true,
@@ -331,6 +379,7 @@ export class ClienteService {
           correo: true,
           dui: true,
           id_tipo_cliente: true,
+          DTEPais: true,
         },
       });
       return registroActualizado;

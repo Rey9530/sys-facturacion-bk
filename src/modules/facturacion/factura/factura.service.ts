@@ -109,6 +109,12 @@ export class FacturaService {
       credito = 0,
       id_metodo_pago = 0,
       id_cliente = 0,
+      flete = 0,
+      seguro = 0,
+      id_tipo_item = 0,
+      incoterms = 0,
+      recinto_fiscal = '',
+      regimen = '',
       id_descuento = null,
       detalle_factura = [],
     } = createFacturaDto;
@@ -127,9 +133,11 @@ export class FacturaService {
     transferencia = Number(transferencia);
     credito = Number(credito);
     id_municipio = Number(id_municipio);
+    incoterms = Number(incoterms);
     id_tipo_factura = Number(id_tipo_factura);
     id_descuento = id_descuento > 0 ? id_descuento : null;
     id_municipio = id_municipio > 0 ? id_municipio : null;
+    incoterms = incoterms > 0 ? incoterms : null;
     id_tipo_factura = id_tipo_factura > 0 ? id_tipo_factura : 0;
 
     const tipoFactura = await this.prisma.facturasTipos.findFirst({
@@ -202,9 +210,6 @@ export class FacturaService {
         let venta_nosujeto = detalle.tipo == 'NOSUJETO' ? detalle.total : 0;
         let venta_exenta = detalle.tipo == 'EXENTA' ? detalle.total : 0;
 
-        // descuNoSuj = descuNoSuj + (detalle.tipo == "NOSUJETO" ? detalle.descuento : 0);
-        // descuExenta = descuExenta + (detalle.tipo == "EXENTA" ? detalle.descuento : 0);
-        // descuGravada = descuGravada + (detalle.tipo == "GRABADO" ? detalle.descuento : 0);
 
         totalNoSuj =
           totalNoSuj + (detalle.tipo == 'NOSUJETO' ? detalle.total : 0);
@@ -249,9 +254,24 @@ export class FacturaService {
     const bloque = tipoFactura?.Bloques[0];
     const id_bloque = tipoFactura?.Bloques[0].id_bloque;
     const numero_factura = bloque?.actual.toString().padStart(10, '0');
+    let codIncoterms = null;
+    let descIncoterms = null;
+    if (incoterms != null && incoterms > 0) {
+      const incotermsDB = await this.prisma.dTEIncoterms.findFirst({
+        where: { id_incoterms: incoterms },
+      });
+      codIncoterms = incotermsDB.codigo;
+      descIncoterms = incotermsDB.valor;
+    }
+
     const factura = await this.prisma.facturas.create({
       data: {
+        tipoItemExpor: Number(id_tipo_item),
+        recintoFiscal: recinto_fiscal.toString(),
+        regimen: regimen.toString(),
         id_sucursal,
+        flete,
+        seguro,
         cliente,
         numero_factura,
         direccion,
@@ -264,7 +284,8 @@ export class FacturaService {
         id_cliente,
         id_metodo_pago,
         id_usuario,
-
+        codIncoterms,
+        descIncoterms,
         efectivo: formatNumberDecimal(efectivo),
         tarjeta: formatNumberDecimal(tarjeta),
         cheque: formatNumberDecimal(cheque),
@@ -275,7 +296,7 @@ export class FacturaService {
         iva: formatNumberDecimal(iva),
         iva_retenido: formatNumberDecimal(iva_retenido),
         iva_percivido: formatNumberDecimal(iva_percivido),
-        total: formatNumberDecimal(total),
+        total: formatNumberDecimal(total + flete + seguro),
         descuNoSuj: formatNumberDecimal(descuNoSuj),
         descuExenta: formatNumberDecimal(descuExenta),
         descuGravada: formatNumberDecimal(descuGravada),
@@ -326,6 +347,7 @@ export class FacturaService {
               Municipio: { include: { Departamento: true } },
               DTEActividadEconomica: true,
               DTETipoDocumentoIdentificacion: true,
+              DTEPais: true
             },
           },
         },
@@ -385,7 +407,7 @@ export class FacturaService {
           mode: 'insensitive',
         },
       };
-    }); 
+    });
     let data = await this.prisma.catalogo.findMany({
       where: {
         OR: [{ OR: [...arrayName] }, { OR: [...arrayCode] }],
@@ -558,13 +580,20 @@ export class FacturaService {
     };
   }
 
-  findAll() {
-    return `This action returns all factura`;
-  }
   async obntenerMetodosDePago() {
     return await this.prisma.facturasMetodosDePago.findMany({
       where: { estado: 'ACTIVO' },
     });
+  }
+  async datosExtras() {
+
+    const [tipoItem, recintoFiscal, regimen, incoterms] = await Promise.all([
+      await this.prisma.dTETipoItem.findMany({ orderBy: { valor: 'asc' } }),
+      await this.prisma.dTERecintoFiscal.findMany({ orderBy: { valor: 'asc' } }),
+      await this.prisma.dTERegimen.findMany({ orderBy: { valor: 'asc' } }),
+      await this.prisma.dTEIncoterms.findMany({ orderBy: { valor: 'asc' } }),
+    ]);
+    return { tipoItem, recintoFiscal, regimen, incoterms };
   }
   async obtenerListadoMunicipios(id: number) {
     let id_departamento: number = Number(id);
@@ -645,6 +674,7 @@ export class FacturaService {
             Municipio: { include: { Departamento: true } },
             DTEActividadEconomica: true,
             DTETipoDocumentoIdentificacion: true,
+            DTEPais: true
           },
         },
       },
@@ -718,14 +748,14 @@ export class FacturaService {
   }
   async removeSinDTE(
     id_factura: number,
-    user: Usuarios, 
+    user: Usuarios,
   ) {
     let id_sucursal = Number(user.id_sucursal);
     const data = await this.prisma.facturas.findMany({
       where: { estado: 'ACTIVO', id_factura, id_sucursal },
     });
 
-    if (!data) throw new NotFoundException('La factura no existe'); 
+    if (!data) throw new NotFoundException('La factura no existe');
     await this.prisma.facturas.update({
       where: { id_factura },
       data: { estado: 'ANULADA' },

@@ -111,8 +111,12 @@ export class PdfDteService {
     if (jsonDte.identificacion.tipoDte == "03") {
       jsonDte.nombreFactura = "COMPROBANTE DE CRÉDITO FISCAL";
     }
-
     template = 'reports/dte/factura.html';
+    if (jsonDte.identificacion.tipoDte == "11") {
+      jsonDte.nombreFactura = "FACTURA DE EXPORTACIÓN";
+      template = 'reports/dte/factura-exportacion.html';
+    }
+
     return this.renderPdf(jsonDte, template);
   }
 

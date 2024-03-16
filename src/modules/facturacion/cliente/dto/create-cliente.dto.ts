@@ -26,19 +26,24 @@ export class CreateClienteDto {
   @IsOptional()
   nit: string;
 
-  @ApiProperty({}) 
+  @ApiProperty({})
   @IsOptional()
   id_tipo_documento: number;
 
-  @ApiProperty({}) 
+  @ApiProperty({})
   @IsOptional()
   id_actividad_economica: number;
 
-  @ApiProperty({}) 
+  @ApiProperty({})
   @IsOptional()
   id_municipio: number;
 
-  @ApiProperty({}) 
+
+  @ApiProperty({})
+  @IsOptional()
+  id_pais: number;
+
+  @ApiProperty({})
   @IsOptional()
   id_tipo_cliente: number;
 

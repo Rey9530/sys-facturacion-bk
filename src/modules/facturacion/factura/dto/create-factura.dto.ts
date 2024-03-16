@@ -10,93 +10,120 @@ import {
 
 export class CreateFacturaDto {
   @ApiProperty({})
-  @IsString() 
+  @IsString()
   cliente: string;
 
-  @ApiProperty({}) 
+  @ApiProperty({})
   @IsOptional()
   direccion: string;
 
-  @ApiProperty({}) 
+  @ApiProperty({})
   @IsOptional()
   no_registro: string;
 
-  @ApiProperty({}) 
+  @ApiProperty({})
   @IsOptional()
   nit: string;
 
-  @ApiProperty({}) 
+  @ApiProperty({})
   @IsOptional()
   giro: string;
 
-  @ApiProperty({}) 
+  @ApiProperty({})
   @IsOptional()
   id_municipio: number;
 
   @ApiProperty({})
   @IsNumber()
-  @IsPositive() 
+  @IsPositive()
   id_tipo_factura: number;
 
-  @ApiProperty({}) 
+  @ApiProperty({})
   @IsOptional()
   subtotal: number;
 
-  @ApiProperty({}) 
+  @ApiProperty({})
   @IsOptional()
   descuento: number;
 
-  @ApiProperty({}) 
+  @ApiProperty({})
   @IsOptional()
   iva: number;
 
-  @ApiProperty({}) 
+  @ApiProperty({})
   @IsOptional()
   iva_retenido: number;
 
-  @ApiProperty({}) 
+  @ApiProperty({})
   @IsOptional()
   iva_percivido: number;
 
-  @ApiProperty({}) 
+  @ApiProperty({})
   @IsOptional()
   total: number;
 
-  @ApiProperty({}) 
+  @ApiProperty({})
   @IsOptional()
   efectivo: number;
 
-  @ApiProperty({}) 
+  @ApiProperty({})
   @IsOptional()
   tarjeta: number;
 
-  @ApiProperty({}) 
+  @ApiProperty({})
   @IsOptional()
   cheque: number;
 
-  @ApiProperty({}) 
+  @ApiProperty({})
   @IsOptional()
   transferencia: number;
 
-  @ApiProperty({}) 
+  @ApiProperty({})
   @IsOptional()
   credito: number;
 
   @ApiProperty({})
   @IsNumber()
-  @IsPositive() 
+  @IsPositive()
   id_metodo_pago: number;
 
-  @ApiProperty({}) 
+  @ApiProperty({})
   @IsOptional()
   id_cliente: number;
 
-  @ApiProperty({}) 
-  @IsOptional() 
+  @ApiProperty({})
+  @IsOptional()
   id_descuento: number;
 
   @ApiProperty({})
   @IsArray()
   @IsOptional()
   detalle_factura: [];
+
+
+  @ApiProperty({})
+  @IsOptional()
+  id_tipo_item: number;
+
+  @ApiProperty({})
+  @IsOptional()
+  recinto_fiscal: string;
+
+  @ApiProperty({})
+  @IsOptional()
+  regimen: string;
+
+
+  @ApiProperty({})
+  @IsOptional()
+  seguro: number;
+
+  @ApiProperty({})
+  @IsOptional()
+  flete: number;
+
+
+  @ApiProperty({})
+  @IsOptional()
+  incoterms: number;
 }

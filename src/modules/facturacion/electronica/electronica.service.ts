@@ -7,7 +7,7 @@ import { v5 as uuidv5, v4 as uuidv4 } from 'uuid';
 import { format } from 'date-fns';
 import * as jwt from 'jsonwebtoken';
 import { SendEmailsService } from 'src/modules/send-emails/send-emails.service';
-import { NumeroALetras,  eliminarGuionesYEspacios, verifyEmail } from 'src/common/helpers';
+import { NumeroALetras, eliminarGuionesYEspacios, verifyEmail } from 'src/common/helpers';
 import { TIMEOUTAXIOS } from 'src/common/const/directory';
 import e from 'express';
 
@@ -273,6 +273,121 @@ export class ElectronicaService {
     return await this.firmarDocumento(data, dataSistem);
   }
 
+
+  async generateDTEIP(factura: any) {
+    const dataSistem = await this.prisma.generalData.findFirst();
+    let fecha = factura.fecha_creacion || new Date();
+    let fechaFormateada = format(fecha, 'yyyy-MM-dd HH:mm:ss');
+    let uuid = uuidv5(factura.numero_factura, uuidv4());
+    let numeroControl = factura.Bloque.serie + factura.numero_factura;
+    let detalle: any[] = [];
+    for (let index = 0; index < factura.FacturasDetalle.length; index++) {
+      const element: any = factura.FacturasDetalle[index];
+      detalle.push({
+        "numItem": index + 1,
+        "cantidad": element.cantidad,
+        "codigo": element.codigo,
+        "uniMedida": 99,
+        "descripcion": element.nombre,
+        "precioUni": element.precio_unitario,
+        "montoDescu": element.descuento,
+        "ventaGravada": element.venta_grabada,
+        "tributos": null,
+        "noGravado": 0
+      });
+    }
+
+    console.log(factura.Cliente)
+    const contingencia = await this.prisma.contingenciasDetalle.findFirst({ where: { id_factura: factura.id_factura }, include: { Contingencias: true } });
+    let data = {
+      "identificacion": {
+        "version": factura.Bloque.Tipo.version,
+        "ambiente": dataSistem.ambiente,
+        "tipoDte": factura.Bloque.Tipo.codigo,
+        "numeroControl": numeroControl,
+        "codigoGeneracion": uuid.toUpperCase(),
+        "tipoModelo": contingencia != null ? 2 : 1,
+        "tipoOperacion": contingencia != null ? 2 : 1,
+        "tipoContingencia": contingencia != null ? contingencia.Contingencias.tipo : null,
+        "motivoContigencia": contingencia != null ? contingencia.Contingencias.motivo : null,
+        "fecEmi": fechaFormateada.toString().split(' ')[0],
+        "horEmi": fechaFormateada.toString().split(' ')[1],
+        "tipoMoneda": "USD"
+      },
+      "otrosDocumentos": null,
+      "emisor": {
+        "nit": eliminarGuionesYEspacios(dataSistem.nit),
+        "nrc": eliminarGuionesYEspacios(dataSistem.nrc),
+        "nombre": dataSistem.nombre_sistema,
+        "codActividad": dataSistem.cod_actividad,
+        "descActividad": dataSistem.desc_actividad,
+        "nombreComercial": dataSistem.nombre_comercial,
+        "tipoEstablecimiento": factura.Sucursal.DTETipoEstablecimiento != null ? factura.Sucursal.DTETipoEstablecimiento.codigo : null,
+        "direccion": {
+          "departamento": factura.Sucursal.Municipio.Departamento.codigo,
+          "municipio": factura.Sucursal.Municipio.codigo,
+          "complemento": factura.Sucursal.complemento
+        },
+        "telefono": "(503) " + dataSistem.contactos,
+        "codPuntoVentaMH": dataSistem.cod_punto_venta_MH != null && dataSistem.cod_punto_venta_MH.length > 0 ? dataSistem.cod_punto_venta_MH : null,
+        "codPuntoVenta": dataSistem.cod_punto_venta != null && dataSistem.cod_punto_venta.length > 0 ? dataSistem.cod_punto_venta : null,
+        "codEstableMH": dataSistem.cod_estable_MH != null && dataSistem.cod_estable_MH.length > 0 ? dataSistem.cod_estable_MH : null,
+        "codEstable": dataSistem.cod_estable != null && dataSistem.cod_estable.length > 0 ? dataSistem.cod_estable : null,
+        "correo": dataSistem.correo,
+
+        "tipoItemExpor": factura.tipoItemExpor,
+        "recintoFiscal": factura.recintoFiscal,
+        "regimen": factura.regimen
+      },
+      "receptor": {
+        "tipoDocumento": factura.Cliente.DTETipoDocumentoIdentificacion != null ? factura.Cliente.DTETipoDocumentoIdentificacion.codigo : null,
+        "numDocumento": (factura.Cliente.dui != null && factura.Cliente.dui.length > 0) ? eliminarGuionesYEspacios(factura.Cliente.dui) : null,
+        "nombre": factura.Cliente.nombre,
+        "descActividad": factura.Cliente.DTEActividadEconomica != null ? factura.Cliente.DTEActividadEconomica.nombre : null,
+        "complemento": (factura.Cliente.Municipio == null || factura.Cliente.id_municipio == null) ? null
+          : factura.Cliente.direccion,
+        "telefono": (factura.Cliente.telefono != null && factura.Cliente.telefono).length > 0 ? factura.Cliente.telefono : null,
+        "correo": (factura.Cliente.correo != null && factura.Cliente.correo.length > 0) ? factura.Cliente.correo : null,
+        "nombreComercial": factura.Cliente.razon_social != null ? factura.Cliente.razon_social : null,
+
+        "codPais": factura.Cliente.DTEPais.codigo,
+        "nombrePais": factura.Cliente.DTEPais.valor,
+        "tipoPersona": 1,
+      },
+      "ventaTercero": null,
+      "cuerpoDocumento": [
+        ...detalle
+      ],
+      "resumen": {
+        "totalGravada": factura.totalGravada,
+        "totalNoGravado": 0,
+        "porcentajeDescuento": 0,
+        "totalDescu": factura.descuento,
+        "montoTotalOperacion": factura.total,
+        "totalPagar": factura.total,
+        "totalLetras": NumeroALetras(parseFloat(factura.total.toFixed(2))).toUpperCase(),
+        "condicionOperacion": 1,
+        "pagos": null,
+        "numPagoElectronico": null, 
+        "descuento": factura.descuento,
+        "observaciones": null,
+        "flete": factura.flete,
+        "seguro": factura.seguro, 
+        "codIncoterms": factura.codIncoterms,
+        "descIncoterms": factura.descIncoterms,
+
+      }, 
+      "apendice": null
+    }
+    await this.prisma.facturas.update({
+      where: { id_factura: factura.id_factura },
+      data: {
+        dte_json: JSON.stringify(data)
+      }
+    });
+    return await this.firmarDocumento(data, dataSistem);
+  }
+
   async firmarDocumento(data, dataSistem) {
     let datos = {
       "nit": dataSistem.nit,
@@ -306,6 +421,8 @@ export class ElectronicaService {
       token = await this.generateDTEFC(factura);
     } else if (factura.Bloque.Tipo.codigo == "03") {
       token = await this.generateDTECCF(factura);
+    } else if (factura.Bloque.Tipo.codigo == "11") {
+      token = await this.generateDTEIP(factura);
     }
     return await this.envairFactura(factura, token);
   }
@@ -362,7 +479,7 @@ export class ElectronicaService {
     console.log(data)
     let token = await this.firmarDocumento(data, dataSistem);
     const respContingencia = await this.envairContingencia(dataSistem.nit, token, id_contingencia);
-    this.iniciarEnvioContingencia(contingencia, id_contingencia); 
+    this.iniciarEnvioContingencia(contingencia, id_contingencia);
     return respContingencia;
   }
   async iniciarEnvioContingencia(contingencia, id_contingencia) {
@@ -595,7 +712,7 @@ export class ElectronicaService {
         }
       }
       return msjError;
-    } 
+    }
   }
   async envairFactura(factura: any, token: string) {
     const dataSistem = await this.prisma.generalData.findFirst();

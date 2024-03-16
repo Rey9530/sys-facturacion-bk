@@ -312,9 +312,10 @@ model DTEFormaPago {
 }
 
 model DTEPais {
-  id_pais Int    @id @default(autoincrement())
+  id_pais Int       @id @default(autoincrement())
   codigo  String
   valor   String
+  Cliente Cliente[]
 }
 
 model DTEOtrosDocumentosAsociados {
@@ -488,6 +489,8 @@ model Cliente {
   razon_social                   String?                         @default("")
   registro_nrc                   String?                         @default("")
   nit                            String?                         @default("")
+  id_pais                        Int?
+  DTEPais                        DTEPais?                        @relation(fields: [id_pais], references: [id_pais], onDelete: NoAction, onUpdate: NoAction, map: "fk_cliente_pais")
   id_municipio                   Int?                            @default(0)
   Municipio                      Municipios?                     @relation(fields: [id_municipio], references: [id_municipio], onDelete: NoAction, onUpdate: NoAction, map: "fk_cliente_municipio")
   direccion                      String?                         @default("")
@@ -522,6 +525,11 @@ model Facturas {
   no_registro               String?                @default("")
   nit                       String?                @default("")
   giro                      String?                @default("")
+  tipoItemExpor             Int?                   @default(0)
+  recintoFiscal             String?                @default("")
+  regimen                   String?                @default("")
+  codIncoterms              String?                @default("")
+  descIncoterms             String?                @default("")
   id_municipio              Int?                   @default(0)
   Municipio                 Municipios?            @relation(fields: [id_municipio], references: [id_municipio], onDelete: NoAction, onUpdate: NoAction, map: "fk_fatura_municipio")
   id_cliente                Int?
@@ -552,6 +560,8 @@ model Facturas {
   totalGravada              Float?                 @default(0)
   totalNoGravado            Float?                 @default(0)
   total                     Float?                 @default(0)
+  flete                     Float?                 @default(0)
+  seguro                    Float?                 @default(0)
   clase                     Int?                   @default(1) // 1==Imprenta o tikets, 2==Formulario unico, 4==Factura electronica(dte)
   dte_json                  String?                @db.Text
   response_dte_json         String?                @db.Text

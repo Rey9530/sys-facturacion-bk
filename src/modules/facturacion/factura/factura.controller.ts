@@ -62,16 +62,15 @@ export class FacturaController {
     @GetUser() user: Usuarios,
   ) {
     return this.facturaService.buscarClientes(dataDto, user);
-  }
-
-  @Get()
-  findAll() {
-    return this.facturaService.findAll();
-  }
-
+  } 
+  
   @Get('obtener_metodos_pago')
   obntenerMetodosDePago() {
     return this.facturaService.obntenerMetodosDePago();
+  }
+  @Get('obtener/datos-extras')
+  datosExtras() {
+    return this.facturaService.datosExtras();
   }
 
   @Get('obtener_listado_facturas')

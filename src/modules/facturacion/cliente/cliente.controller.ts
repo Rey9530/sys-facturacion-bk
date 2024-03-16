@@ -28,8 +28,7 @@ export class ClienteController {
 
   @Post()
   create(
-    @Body() createClienteDto: CreateClienteDto,
-
+    @Body() createClienteDto: CreateClienteDto, 
     @GetUser() user: Usuarios,
   ) {
     return this.clienteService.create(createClienteDto, user);
@@ -50,6 +49,14 @@ export class ClienteController {
   @Get("obtener/actividades/economicas")
   findAllActividadEconomica() {
     return this.clienteService.findAllActividadEconomica();
+  }
+  @Get("obtener/paises")
+  getAllCountry() {
+    return this.clienteService.getAllCountry();
+  }
+  @Get("catalogo")
+  getCatalog() {
+    return this.clienteService.getCatalog();
   }
 
   @Get(':id')
