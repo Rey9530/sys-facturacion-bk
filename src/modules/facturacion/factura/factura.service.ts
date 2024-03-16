@@ -329,7 +329,7 @@ export class FacturaService {
       const facturaCreada = await this.prisma.facturas.findUnique({
         where: { id_factura: factura.id_factura },
         include: {
-          FacturasDetalle: true,
+          FacturasDetalle: { include: { Catalogo: true } },
           Sucursal: {
             include: {
               DTETipoEstablecimiento: true,
@@ -657,7 +657,7 @@ export class FacturaService {
     const facturaCreada = await this.prisma.facturas.findUnique({
       where: { id_factura: id_factura },
       include: {
-        FacturasDetalle: true,
+        FacturasDetalle: { include: { Catalogo: true } },
         Sucursal: {
           include: {
             DTETipoEstablecimiento: true,

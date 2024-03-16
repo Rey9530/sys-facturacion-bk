@@ -71,7 +71,11 @@ export class PdfDteService {
     var token = JSON.parse(factura_s.response_dte_json);
     jsonDte.firmaElectronica = jsonFirma.selloRecibido;
     jsonDte.selloRecibido = token.selloRecibido;
-    jsonDte.receptor.tipoDocumento = factura_s.Cliente.DTETipoDocumentoIdentificacion?.nombre ?? "";
+    if (jsonDte.identificacion.tipoDte == "14") {
+      jsonDte.sujetoExcluido.tipoDocumento = factura_s.Cliente.DTETipoDocumentoIdentificacion?.nombre ?? "";
+    } else {
+      jsonDte.receptor.tipoDocumento = factura_s.Cliente.DTETipoDocumentoIdentificacion?.nombre ?? "";
+    }
     jsonDte.resumen.totalNoSuj = formatNumber(jsonDte.resumen.totalNoSuj);
     jsonDte.resumen.totalExenta = formatNumber(jsonDte.resumen.totalExenta);
     jsonDte.resumen.totalGravada = formatNumber(jsonDte.resumen.totalGravada);
@@ -115,6 +119,10 @@ export class PdfDteService {
     if (jsonDte.identificacion.tipoDte == "11") {
       jsonDte.nombreFactura = "FACTURA DE EXPORTACIÓN";
       template = 'reports/dte/factura-exportacion.html';
+    }
+    if (jsonDte.identificacion.tipoDte == "14") {
+      jsonDte.nombreFactura = "FACTURA SUJETO EXCLUIDO";
+      template = 'reports/dte/factura-excluido.html';
     }
 
     return this.renderPdf(jsonDte, template);

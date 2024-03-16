@@ -368,15 +368,15 @@ export class ElectronicaService {
         "totalLetras": NumeroALetras(parseFloat(factura.total.toFixed(2))).toUpperCase(),
         "condicionOperacion": 1,
         "pagos": null,
-        "numPagoElectronico": null, 
+        "numPagoElectronico": null,
         "descuento": factura.descuento,
         "observaciones": null,
         "flete": factura.flete,
-        "seguro": factura.seguro, 
+        "seguro": factura.seguro,
         "codIncoterms": factura.codIncoterms,
         "descIncoterms": factura.descIncoterms,
 
-      }, 
+      },
       "apendice": null
     }
     await this.prisma.facturas.update({
@@ -388,6 +388,107 @@ export class ElectronicaService {
     return await this.firmarDocumento(data, dataSistem);
   }
 
+  async generateDTESU(factura: any) {
+    const dataSistem = await this.prisma.generalData.findFirst();
+    let fecha = factura.fecha_creacion || new Date();
+    let fechaFormateada = format(fecha, 'yyyy-MM-dd HH:mm:ss');
+    let uuid = uuidv5(factura.numero_factura, uuidv4());
+    let numeroControl = factura.Bloque.serie + factura.numero_factura;
+    let detalle: any[] = [];
+    for (let index = 0; index < factura.FacturasDetalle.length; index++) {
+      const element: any = factura.FacturasDetalle[index];
+      detalle.push({
+
+
+        "numItem": index + 1,
+        "cantidad": element.cantidad,
+        "codigo": element.codigo,
+        "uniMedida": 99,
+        "descripcion": element.nombre,
+        "precioUni": element.precio_unitario,
+        "montoDescu": element.descuento,  
+        "tipoItem": element.Catalogo.id_tipo == 1 ? 2 : 1,
+        "compra": element.venta_grabada,
+
+      });
+    }
+
+    console.log(factura.Cliente)
+    const contingencia = await this.prisma.contingenciasDetalle.findFirst({ where: { id_factura: factura.id_factura }, include: { Contingencias: true } });
+    let data = {
+      "identificacion": {
+        "version": factura.Bloque.Tipo.version,
+        "ambiente": dataSistem.ambiente,
+        "tipoDte": factura.Bloque.Tipo.codigo,
+        "numeroControl": numeroControl,
+        "codigoGeneracion": uuid.toUpperCase(),
+        "tipoModelo": contingencia != null ? 2 : 1,
+        "tipoOperacion": contingencia != null ? 2 : 1,
+        "tipoContingencia": contingencia != null ? contingencia.Contingencias.tipo : null,
+        "motivoContin": contingencia != null ? contingencia.Contingencias.motivo : null,
+        "fecEmi": fechaFormateada.toString().split(' ')[0],
+        "horEmi": fechaFormateada.toString().split(' ')[1],
+        "tipoMoneda": "USD"
+      },
+      "emisor": {
+        "nit": eliminarGuionesYEspacios(dataSistem.nit),
+        "nrc": eliminarGuionesYEspacios(dataSistem.nrc),
+        "nombre": dataSistem.nombre_sistema,
+        "codActividad": dataSistem.cod_actividad,
+        "descActividad": dataSistem.desc_actividad,
+        "direccion": {
+          "departamento": factura.Sucursal.Municipio.Departamento.codigo,
+          "municipio": factura.Sucursal.Municipio.codigo,
+          "complemento": factura.Sucursal.complemento
+        },
+        "telefono": "(503) " + dataSistem.contactos,
+        "codPuntoVentaMH": dataSistem.cod_punto_venta_MH != null && dataSistem.cod_punto_venta_MH.length > 0 ? dataSistem.cod_punto_venta_MH : null,
+        "codPuntoVenta": dataSistem.cod_punto_venta != null && dataSistem.cod_punto_venta.length > 0 ? dataSistem.cod_punto_venta : null,
+        "codEstableMH": dataSistem.cod_estable_MH != null && dataSistem.cod_estable_MH.length > 0 ? dataSistem.cod_estable_MH : null,
+        "codEstable": dataSistem.cod_estable != null && dataSistem.cod_estable.length > 0 ? dataSistem.cod_estable : null,
+        "correo": dataSistem.correo
+      },
+      "sujetoExcluido": {
+        "tipoDocumento": factura.Cliente.DTETipoDocumentoIdentificacion != null ? factura.Cliente.DTETipoDocumentoIdentificacion.codigo : null,
+        "numDocumento": (factura.Cliente.dui != null && factura.Cliente.dui.length > 0) ? eliminarGuionesYEspacios(factura.Cliente.dui) : null,
+        "nombre": factura.Cliente.nombre,
+        "codActividad": factura.Cliente.DTEActividadEconomica != null ? factura.Cliente.DTEActividadEconomica.codigo : null,
+        "descActividad": factura.Cliente.DTEActividadEconomica != null ? factura.Cliente.DTEActividadEconomica.nombre : null,
+        "direccion": (factura.Cliente.Municipio == null || factura.Cliente.id_municipio == null) ? null
+          : {
+            "departamento": factura.Cliente.Municipio != null ? factura.Cliente.Municipio.Departamento.codigo : null,
+            "municipio": factura.Cliente.Municipio != null ? factura.Cliente.Municipio.codigo : null,
+            "complemento": factura.Cliente.direccion ?? null
+          },
+        "telefono": (factura.Cliente.telefono != null && factura.Cliente.telefono).length > 0 ? factura.Cliente.telefono : null,
+        "correo": (factura.Cliente.correo != null && factura.Cliente.correo.length > 0) ? factura.Cliente.correo : null 
+      },
+      "cuerpoDocumento": [
+        ...detalle
+      ],
+      "resumen": {  
+        "totalCompra": factura.totalGravada,
+        "descu": 0.00,
+        "totalDescu": 0.00,
+        "subTotal": factura.subtotal,
+        "ivaRete1": 0.00,
+        "reteRenta": 0.00,  
+        "totalPagar": factura.total,
+        "totalLetras": NumeroALetras(parseFloat(factura.total.toFixed(2))).toUpperCase(),
+        "condicionOperacion": 1,
+        "pagos": null,
+        "observaciones": null,
+      },
+      "apendice": null
+    }
+    await this.prisma.facturas.update({
+      where: { id_factura: factura.id_factura },
+      data: {
+        dte_json: JSON.stringify(data)
+      }
+    });
+    return await this.firmarDocumento(data, dataSistem);
+  }
   async firmarDocumento(data, dataSistem) {
     let datos = {
       "nit": dataSistem.nit,
@@ -423,6 +524,8 @@ export class ElectronicaService {
       token = await this.generateDTECCF(factura);
     } else if (factura.Bloque.Tipo.codigo == "11") {
       token = await this.generateDTEIP(factura);
+    } else if (factura.Bloque.Tipo.codigo == "14") {
+      token = await this.generateDTESU(factura);
     }
     return await this.envairFactura(factura, token);
   }
