@@ -24,7 +24,7 @@ export class ElectronicaService {
     let fecha = new Date();
     let fechaFormateada = format(fecha, 'yyyy-MM-dd HH:mm:ss');
     let uuid = uuidv5(factura.numero_factura, uuidv4());
-    let uuid2 = uuidv5(factura.numero_factura, uuidv4());
+    // let uuid2 = uuidv5(factura.numero_factura, uuidv4());
     var jsonDte = JSON.parse(factura.dte_json);
     var jsonDteResponse = JSON.parse(factura.response_dte_json);
     var data = {
@@ -54,7 +54,7 @@ export class ElectronicaService {
         "numeroControl": jsonDte.identificacion.numeroControl,
         "fecEmi": jsonDte.identificacion.fecEmi,
         "montoIva": jsonDte.resumen.totalIva,
-        "codigoGeneracionR": uuid2.toUpperCase(),
+        "codigoGeneracionR": null,
         "tipoDocumento": jsonDte.receptor.tipoDocumento,
         "numDocumento": jsonDte.receptor.numDocumento,
         "nombre": jsonDte.receptor.nombre,
@@ -71,6 +71,11 @@ export class ElectronicaService {
         "tipDocSolicita": user.DTETipoDocumentoIdentificacion != null ? user.DTETipoDocumentoIdentificacion.codigo : null,
         "numDocSolicita": user.dui
       }
+    }
+    if (jsonDte.identificacion.tipoDte == "03") {
+      data.documento.montoIva = jsonDte.resumen.tributos[0].valor;
+      data.documento.tipoDocumento = "36";
+      data.documento.numDocumento = jsonDte.receptor.nit;
     }
 
     await this.prisma.facturas.update({
@@ -115,7 +120,7 @@ export class ElectronicaService {
           }
         });
       }
-      return null;
+      return "";
     } catch (error) {
       console.log(error.response); // Mensaje de error
       if (error.response == undefined) {
@@ -139,6 +144,185 @@ export class ElectronicaService {
         }
       }
       return msjError;
+    }
+  }
+
+  async debitFacturaElectronica(factura: Facturas, user: any,) {
+    const dataSistem = await this.prisma.generalData.findFirst();
+    let fecha = new Date();
+    let fechaFormateada = format(fecha, 'yyyy-MM-dd HH:mm:ss');
+    let uuid = uuidv5(factura.numero_factura, uuidv4());
+    var jsonDte = JSON.parse(factura.dte_json);
+    const responseDteJson = JSON.parse(factura.response_dte_json);
+    const bloque = await this.prisma.facturasBloques.findFirst({
+      where: {
+        estado: 'ACTIVO',
+        Tipo: {
+          codigo: '05'
+        }
+      },
+      include: {
+        Tipo: true
+      }
+    });
+    console.log("bloque===========");
+    const cuerpoDocumento = jsonDte.cuerpoDocumento.map((e) => {
+      e.numeroDocumento = responseDteJson.codigoGeneracion;
+      delete e.noGravado;
+      delete e.psv;
+      return e;
+    })
+    const numero_factura = bloque?.actual.toString().padStart(10, '0');
+    const numeroControl = bloque.serie + numero_factura; 
+    const contingencia = await this.prisma.contingenciasDetalle.findFirst({ where: { id_factura: factura.id_factura }, include: { Contingencias: true } });
+    var data = {
+      "identificacion": {
+        "version": bloque.Tipo.version,
+        "ambiente": dataSistem.ambiente,
+        "tipoDte": bloque.Tipo.codigo,
+        "numeroControl": numeroControl,
+        "codigoGeneracion": uuid.toUpperCase(),
+        "tipoModelo": contingencia != null ? 2 : 1,
+        "tipoOperacion": contingencia != null ? 2 : 1,
+        "tipoContingencia": contingencia != null ? contingencia.Contingencias.tipo : null,
+        "motivoContin": contingencia != null ? contingencia.Contingencias.motivo : null,
+        "fecEmi": fechaFormateada.toString().split(' ')[0],
+        "horEmi": fechaFormateada.toString().split(' ')[1],
+        "tipoMoneda": "USD"
+      },
+      "documentoRelacionado": [
+        {
+          "tipoDocumento": jsonDte.identificacion.tipoDte,
+          "tipoGeneracion": 2,
+          "numeroDocumento": responseDteJson.codigoGeneracion,
+          "fechaEmision": jsonDte.identificacion.fecEmi
+        }
+      ],
+      "emisor": {
+        "nit": jsonDte.emisor.nit,
+        "nrc": jsonDte.emisor.nrc,
+        "nombre": jsonDte.emisor.nombre,
+        "codActividad": jsonDte.emisor.codActividad,
+        "descActividad": jsonDte.emisor.descActividad,
+        "nombreComercial": jsonDte.emisor.nombreComercial,
+        "tipoEstablecimiento": jsonDte.emisor.tipoEstablecimiento,
+        "direccion": {
+          "departamento": jsonDte.emisor.direccion.departamento,
+          "municipio": jsonDte.emisor.direccion.municipio,
+          "complemento": jsonDte.emisor.direccion.complemento,
+        },
+        "telefono": jsonDte.emisor.telefono,
+        "correo": jsonDte.emisor.correo,
+      },
+      "receptor": {
+        "nit": jsonDte.receptor.nit,
+        "nrc": jsonDte.receptor.nrc,
+        "nombre": jsonDte.receptor.nombre,
+        "codActividad": jsonDte.receptor.codActividad,
+        "descActividad": jsonDte.receptor.descActividad,
+        "nombreComercial": jsonDte.receptor.nombreComercial,
+        "direccion": {
+          "departamento": jsonDte.receptor.direccion.departamento,
+          "municipio": jsonDte.receptor.direccion.municipio,
+          "complemento": jsonDte.receptor.direccion.complemento,
+        },
+        "telefono": jsonDte.receptor.telefono,
+        "correo": jsonDte.receptor.correo,
+      },
+      "ventaTercero": null,
+      "cuerpoDocumento": [
+        ...cuerpoDocumento,
+      ],
+      "resumen": {
+        "totalNoSuj": jsonDte.resumen.totalNoSuj ?? 0,
+        "totalExenta": jsonDte.resumen.totalExenta ?? 0,
+        "totalGravada": jsonDte.resumen.totalGravada ?? 0,
+        "subTotalVentas": jsonDte.resumen.subTotalVentas ?? 0,
+        "descuNoSuj": jsonDte.resumen.descuNoSuj ?? 0,
+        "descuExenta": jsonDte.resumen.descuExenta ?? 0,
+        "descuGravada": jsonDte.resumen.descuGravada ?? 0,
+        "totalDescu": jsonDte.resumen.totalDescu ?? 0,
+        "tributos": jsonDte.resumen.tributos ?? 0,
+        "subTotal": jsonDte.resumen.subTotal ?? 0,
+        "ivaPerci1": jsonDte.resumen.ivaPerci1 ?? 0,
+        "ivaRete1": jsonDte.resumen.ivaRete1 ?? 0,
+        "reteRenta": jsonDte.resumen.reteRenta ?? 0,
+        "montoTotalOperacion": jsonDte.resumen.montoTotalOperacion ?? 0,
+        "totalLetras": jsonDte.resumen.totalLetras ?? 0,
+        "condicionOperacion": jsonDte.resumen.condicionOperacion ?? 0,
+      },
+      "extension": null,
+      "apendice": null
+    }
+
+    let token = await this.firmarDocumento(data, dataSistem);
+    const respAPi = await this.enviarDebito(bloque, token);
+    if (respAPi != null && respAPi.descripcionMsg != null && respAPi.descripcionMsg == 'RECIBIDO') {
+      await this.prisma.facturasBloques.update({
+        data: { actual: bloque!.actual + 1 },
+        where: { id_bloque: bloque.id_bloque },
+      });
+      await this.prisma.facturas.update({
+        where: { id_factura: factura.id_factura },
+        data: {
+          notadebito_dte_json: JSON.stringify(data),
+          notadebito_resp_dte_json: JSON.stringify(respAPi),
+          notadebito_fecha: new Date()
+        }
+      });
+    }
+    return respAPi;
+  }
+
+  async enviarDebito(bloque, token) {
+    const dataSistem = await this.prisma.generalData.findFirst();
+    var data = {
+      "ambiente": dataSistem.ambiente,
+      "idEnvio": 1,
+      "version": bloque.Tipo.version,
+      "tipoDte": bloque.Tipo.codigo,
+      "codigoGeneracion": "2",
+      "documento": token
+    }
+    console.timeStamp()
+    let path_ = `${this.configService.get('API_FACTURACION')}fesv/recepciondte`;
+    var jwt = await this.validarToken();
+    const config: AxiosRequestConfig = {
+      timeout: TIMEOUTAXIOS,
+      signal: AbortSignal.timeout(TIMEOUTAXIOS),
+      method: 'post', // Especifica el método HTTP
+      url: path_,       // URL a la que se realizará la solicitud
+      headers: {
+        'Content-Type': 'application/json', // Especifica el tipo de contenido esperado 
+        'Authorization': 'Bearer ' + jwt, // Especifica el tipo de contenido esperado 
+      },
+      data, // Los datos que se enviarán en el cuerpo de la solicitud
+    };
+    try {
+      const respuesta: AxiosResponse = await axios.request(config);
+      if (respuesta.data.descripcionMsg != null && respuesta.data.descripcionMsg == "RECIBIDO") {
+        return respuesta.data
+      } else {
+        return respuesta.data.observaciones.toString();
+      }
+    } catch (error) {
+      let msjError = '';
+      if (error.response == undefined) {
+        msjError += "Error de conexion con el serviodr de MH, favor intentarlo nuevamente mas tarde";
+      } else {
+        if (error.response.data.observaciones != null && Array.isArray(error.response.data.observaciones)) {
+          for (let index = 0; index < error.response.data.observaciones.length; index++) {
+            const element = error.response.data.observaciones[index];
+            msjError += element + '<br>&nbsp;<br>';
+          }
+          if (error.response.data.descripcionMsg != "RECIBIDO") {
+            msjError += error.response.data.descripcionMsg + '<br>&nbsp;<br>';
+          }
+        }
+      }
+      return msjError;
+    } finally {
+      console.timeEnd()
     }
   }
 
@@ -406,7 +590,7 @@ export class ElectronicaService {
         "uniMedida": 99,
         "descripcion": element.nombre,
         "precioUni": element.precio_unitario,
-        "montoDescu": element.descuento,  
+        "montoDescu": element.descuento,
         "tipoItem": element.Catalogo.id_tipo == 1 ? 2 : 1,
         "compra": element.venta_grabada,
 
@@ -461,18 +645,18 @@ export class ElectronicaService {
             "complemento": factura.Cliente.direccion ?? null
           },
         "telefono": (factura.Cliente.telefono != null && factura.Cliente.telefono).length > 0 ? factura.Cliente.telefono : null,
-        "correo": (factura.Cliente.correo != null && factura.Cliente.correo.length > 0) ? factura.Cliente.correo : null 
+        "correo": (factura.Cliente.correo != null && factura.Cliente.correo.length > 0) ? factura.Cliente.correo : null
       },
       "cuerpoDocumento": [
         ...detalle
       ],
-      "resumen": {  
+      "resumen": {
         "totalCompra": factura.totalGravada,
         "descu": 0.00,
         "totalDescu": 0.00,
         "subTotal": factura.subtotal,
         "ivaRete1": 0.00,
-        "reteRenta": 0.00,  
+        "reteRenta": 0.00,
         "totalPagar": factura.total,
         "totalLetras": NumeroALetras(parseFloat(factura.total.toFixed(2))).toUpperCase(),
         "condicionOperacion": 1,

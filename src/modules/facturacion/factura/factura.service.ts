@@ -734,16 +734,69 @@ export class FacturaService {
       where: { id: user.id, estado: 'ACTIVO' },
       include: { DTETipoDocumentoIdentificacion: true },
     });
-    let resp = await this.serviceDTE.anularFacturaElectronica(
+    const resp = await this.serviceDTE.anularFacturaElectronica(
       facturaCreada,
       usuario,
       tipoAnulacion,
       motivoAnulacion,
     );
-    await this.prisma.facturas.update({
-      where: { id_factura },
-      data: { estado: 'ANULADA' },
+    if (resp.length == 0) {
+      await this.prisma.facturas.update({
+        where: { id_factura },
+        data: { estado: 'ANULADA' },
+      });
+
+    }
+    return resp;
+  }
+  async removeDebit(
+    id_factura: number,
+    user: Usuarios,
+  ) {
+    let id_sucursal = Number(user.id_sucursal);
+    const data = await this.prisma.facturas.findMany({
+      where: { estado: 'ACTIVO', id_factura, id_sucursal },
     });
+
+    if (!data) throw new NotFoundException('La factura no existe');
+    const facturaCreada = await this.prisma.facturas.findUnique({
+      where: { id_factura },
+      include: {
+        FacturasDetalle: true,
+        Sucursal: {
+          include: {
+            DTETipoEstablecimiento: true,
+            Municipio: { include: { Departamento: true } },
+          },
+        },
+        Bloque: {
+          include: {
+            Tipo: true,
+          },
+        },
+        Cliente: {
+          include: {
+            Municipio: { include: { Departamento: true } },
+            DTEActividadEconomica: true,
+            DTETipoDocumentoIdentificacion: true,
+          },
+        },
+      },
+    });
+    var usuario = await this.prisma.usuarios.findFirst({
+      where: { id: user.id, estado: 'ACTIVO' },
+      include: { DTETipoDocumentoIdentificacion: true },
+    });
+    const resp = await this.serviceDTE.debitFacturaElectronica(
+      facturaCreada,
+      usuario,
+    );
+    if (resp != null && resp == 'RECIBIDO') {
+      await this.prisma.facturas.update({
+        where: { id_factura },
+        data: { estado: 'ANULADA' },
+      });
+    }
     return resp;
   }
   async removeSinDTE(

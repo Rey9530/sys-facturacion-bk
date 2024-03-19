@@ -31,7 +31,7 @@ export class SeedService {
           { version: 3, nombre: "Comprobante de crédito fiscal", codigo: "03" },
           { version: 3, nombre: "Nota de remisión", codigo: "04" },
           { version: 3, nombre: "Nota de crédito", codigo: "05" },
-          { version: 3, nombre: "Nota de crédito", codigo: "06" },
+          { version: 3, nombre: "Nota de debito", codigo: "06" },
           { version: 1, nombre: "Comprobante de retención", codigo: "07" },
           { version: 1, nombre: "Comprobante de liquidación", codigo: "08" },
           { version: 1, nombre: "Documento contable de liquidación", codigo: "09" },

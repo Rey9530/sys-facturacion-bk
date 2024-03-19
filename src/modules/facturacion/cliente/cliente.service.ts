@@ -234,16 +234,18 @@ export class ClienteService {
   }
   async findOneInvoice(uid: number) {
     uid = uid > 0 ? uid : 0;
-    const registros = await this.prisma.cliente.findFirst({
-      where: { id_cliente: uid, estado: 'ACTIVO' },
-      include: { Municipio: true },
-    });
     await this.findOne(uid);
-    const data = await this.prisma.facturas.findMany({
+    const listado = await this.prisma.facturas.findMany({
       where: { id_cliente: uid },
       include: { Bloque: { include: { Tipo: true } } },
+      orderBy: { id_factura: 'desc' }
     });
-    return data;
+
+    const tipoInvalidacion = await this.prisma.dTETipoInvalidacion.findMany({
+      where: { estado: 'ACTIVO' },
+    });
+
+    return { listado, tipoInvalidacion };
   }
 
   async update(uid: number, updateClienteDto: UpdateClienteDto) {

@@ -569,6 +569,9 @@ model Facturas {
   dte_errores               String?                @db.Text
   anulado_dte_json          String?                @db.Text
   anulado_response_dte_json String?                @db.Text
+  notadebito_dte_json       String?                @default("") @db.Text
+  notadebito_resp_dte_json  String?                @default("") @db.Text
+  notadebito_fecha          DateTime?              @default(now())
   estado                    EstadoFactura          @default(ACTIVO)
   FacturasDetalle           FacturasDetalle[]
   id_sucursal               Int?

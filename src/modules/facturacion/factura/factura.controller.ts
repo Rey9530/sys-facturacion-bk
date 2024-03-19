@@ -62,8 +62,8 @@ export class FacturaController {
     @GetUser() user: Usuarios,
   ) {
     return this.facturaService.buscarClientes(dataDto, user);
-  } 
-  
+  }
+
   @Get('obtener_metodos_pago')
   obntenerMetodosDePago() {
     return this.facturaService.obntenerMetodosDePago();
@@ -150,15 +150,26 @@ export class FacturaController {
     );
   }
 
+  @Delete('debit_factura/:id')
+  debitRmove(
+    @Param('id', ParseIntPipe) id: number,
+    @GetUser() user: Usuarios,
+  ) {
+    return this.facturaService.removeDebit(
+      id,
+      user, 
+    );
+  }
+
 
   @Delete('anular_factura_sin_dte/:id')
   removeSinDTE(
-    @Param('id', ParseIntPipe) id: number, 
+    @Param('id', ParseIntPipe) id: number,
     @GetUser() user: Usuarios,
   ) {
     return this.facturaService.removeSinDTE(
       id,
-      user, 
+      user,
     );
   }
 }
