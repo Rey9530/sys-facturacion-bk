@@ -362,9 +362,9 @@ export class FacturaService {
 
   async buscarClientes(dataDto: BuscartCatalogoDto, user: Usuarios) {
     let { query = '' } = dataDto;
-    if (query.length == 0) {
-      throw new NotFoundException('El parametro no es valido');
-    }
+    // if (query.length == 0) {
+    //   throw new NotFoundException('El parametro no es valido');
+    // }
     let arrayQuery = query.split(' ');
     const data = await this.prisma.cliente.findMany({
       where: {
@@ -382,7 +382,7 @@ export class FacturaService {
         nombre: 'desc',
       },
       take: 20,
-      include: { Municipio: true },
+      include: { Municipio: true, DTEActividadEconomica: true, },
     });
     return data;
   }

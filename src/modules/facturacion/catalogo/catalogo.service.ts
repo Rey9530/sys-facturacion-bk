@@ -111,6 +111,24 @@ export class CatalogoService {
     }
   }
 
+  async getCode() {
+    const registros = await this.prisma.catalogo.findFirst({
+      orderBy: { id_catalogo: 'desc' }
+    });
+
+    if (registros == null) {
+
+      return 1
+        .toString()
+        .padStart(4, '0');
+    } else {
+      return (registros.id_catalogo + 1)
+        .toString()
+        .padStart(4, '0');
+
+    }
+  }
+
   async update(uid: number, updateCatalogoDto: UpdateCatalogoDto) {
     const registro = await this.prisma.catalogo.findFirst({
       where: { id_catalogo: uid, estado: "ACTIVO" },

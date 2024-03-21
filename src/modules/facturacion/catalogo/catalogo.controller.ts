@@ -28,6 +28,11 @@ export class CatalogoController {
     return this.catalogoService.findOne(+id);
   }
 
+  @Get('get/code')
+  getCode() {
+    return this.catalogoService.getCode();
+  }
+
   @Post()
   create(@Body() createCatalogoDto: CreateCatalogoDto) {
     return this.catalogoService.create(createCatalogoDto);

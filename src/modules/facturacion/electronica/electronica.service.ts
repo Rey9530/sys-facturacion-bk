@@ -92,7 +92,6 @@ export class ElectronicaService {
       "version": 2,
       "documento": token
     }
-    console.log(data_)
     let path_ = `${this.configService.get('API_FACTURACION')}fesv/anulardte`;
     var jwt = await this.validarToken();
     const config: AxiosRequestConfig = {
@@ -107,11 +106,7 @@ export class ElectronicaService {
       data: data_, // Los datos que se enviarán en el cuerpo de la solicitud
     };
     try {
-      console.log(path_)
       const respuesta: AxiosResponse = await axios.request(config);
-      console.log(respuesta.data)
-      console.log(respuesta.status)
-      console.log(respuesta.data.observaciones)
       if (respuesta.status == 200) {
         await this.prisma.facturas.update({
           where: { id_factura: factura.id_factura },
@@ -122,7 +117,6 @@ export class ElectronicaService {
       }
       return "";
     } catch (error) {
-      console.log(error.response); // Mensaje de error
       if (error.response == undefined) {
         return "Error de conexion con el serviodr de MH, favor intentarlo nuevamente mas tarde";
       }
@@ -165,7 +159,6 @@ export class ElectronicaService {
         Tipo: true
       }
     });
-    console.log("bloque===========");
     const cuerpoDocumento = jsonDte.cuerpoDocumento.map((e) => {
       e.numeroDocumento = responseDteJson.codigoGeneracion;
       delete e.noGravado;
@@ -173,7 +166,7 @@ export class ElectronicaService {
       return e;
     })
     const numero_factura = bloque?.actual.toString().padStart(10, '0');
-    const numeroControl = bloque.serie + numero_factura; 
+    const numeroControl = bloque.serie + numero_factura;
     const contingencia = await this.prisma.contingenciasDetalle.findFirst({ where: { id_factura: factura.id_factura }, include: { Contingencias: true } });
     var data = {
       "identificacion": {
@@ -274,6 +267,121 @@ export class ElectronicaService {
     return respAPi;
   }
 
+
+  async retencionFacturaElectronica(factura: Facturas,) {
+    const dataSistem = await this.prisma.generalData.findFirst();
+    let fecha = new Date();
+    let fechaFormateada = format(fecha, 'yyyy-MM-dd HH:mm:ss');
+    let uuid = uuidv5(factura.numero_factura, uuidv4());
+    var jsonDte = JSON.parse(factura.dte_json);
+    const responseDteJson = JSON.parse(factura.response_dte_json);
+    const bloque = await this.prisma.facturasBloques.findFirst({
+      where: {
+        estado: 'ACTIVO',
+        Tipo: {
+          codigo: '07'
+        }
+      },
+      include: {
+        Tipo: true
+      }
+    });
+    const numero_factura = bloque?.actual.toString().padStart(10, '0');
+    const numeroControl = bloque.serie + numero_factura;
+    const contingencia = await this.prisma.contingenciasDetalle.findFirst({ where: { id_factura: factura.id_factura }, include: { Contingencias: true } });
+    var data = {
+      "identificacion": {
+        "version": bloque.Tipo.version,
+        "ambiente": dataSistem.ambiente,
+        "tipoDte": bloque.Tipo.codigo,
+        "numeroControl": numeroControl,
+        "codigoGeneracion": uuid.toUpperCase(),
+        "tipoModelo": contingencia != null ? 2 : 1,
+        "tipoOperacion": contingencia != null ? 2 : 1,
+        "tipoContingencia": contingencia != null ? contingencia.Contingencias.tipo : null,
+        "motivoContin": contingencia != null ? contingencia.Contingencias.motivo : null,
+        "fecEmi": fechaFormateada.toString().split(' ')[0],
+        "horEmi": fechaFormateada.toString().split(' ')[1],
+        "tipoMoneda": "USD"
+      },
+      "emisor": {
+        "nit": jsonDte.emisor.nit,
+        "nrc": jsonDte.emisor.nrc,
+        "nombre": jsonDte.emisor.nombre,
+        "codActividad": jsonDte.emisor.codActividad,
+        "descActividad": jsonDte.emisor.descActividad,
+        "nombreComercial": jsonDte.emisor.nombreComercial,
+        "tipoEstablecimiento": jsonDte.emisor.tipoEstablecimiento,
+        "direccion": {
+          "departamento": jsonDte.emisor.direccion.departamento,
+          "municipio": jsonDte.emisor.direccion.municipio,
+          "complemento": jsonDte.emisor.direccion.complemento,
+        },
+        "telefono": jsonDte.emisor.telefono,
+        "correo": jsonDte.emisor.correo,
+        "puntoVentaMH": dataSistem.cod_punto_venta_MH != null && dataSistem.cod_punto_venta_MH.length > 0 ? dataSistem.cod_punto_venta_MH : null,
+        "puntoVenta": dataSistem.cod_punto_venta != null && dataSistem.cod_punto_venta.length > 0 ? dataSistem.cod_punto_venta : null,
+        "codigoMH": dataSistem.cod_estable_MH != null && dataSistem.cod_estable_MH.length > 0 ? dataSistem.cod_estable_MH : null,
+        "codigo": dataSistem.cod_estable != null && dataSistem.cod_estable.length > 0 ? dataSistem.cod_estable : null
+      },
+      "receptor": {
+        "tipoDocumento": "36",
+        "numDocumento": jsonDte.receptor.nit,
+        "nrc": jsonDte.receptor.nrc,
+        "nombre": jsonDte.receptor.nombre,
+        "codActividad": jsonDte.receptor.codActividad,
+        "descActividad": jsonDte.receptor.descActividad,
+        "nombreComercial": jsonDte.receptor.nombreComercial,
+        "direccion": {
+          "departamento": jsonDte.receptor.direccion.departamento,
+          "municipio": jsonDte.receptor.direccion.municipio,
+          "complemento": jsonDte.receptor.direccion.complemento,
+        },
+        "telefono": jsonDte.receptor.telefono,
+        "correo": jsonDte.receptor.correo,
+      },
+      "cuerpoDocumento": [
+        {
+          "numItem": 1,
+          "tipoDte": jsonDte.identificacion.tipoDte,
+          "tipoDoc": 2,
+          "numDocumento": responseDteJson.codigoGeneracion,
+          "fechaEmision": jsonDte.identificacion.fecEmi,
+          "montoSujetoGrav": jsonDte.resumen.totalGravada,
+          "codigoRetencionMH": "22",
+          "ivaRetenido": jsonDte.resumen.ivaRete1,
+          "descripcion": "Retención del 1%"
+        }
+      ],
+      "resumen": {
+        "totalSujetoRetencion": jsonDte.resumen.totalGravada,
+        "totalIVAretenido": jsonDte.resumen.ivaRete1,
+        "totalIVAretenidoLetras": NumeroALetras(parseFloat(jsonDte.resumen.ivaRete1.toFixed(2))).toUpperCase(),
+      },
+      "extension": null,
+      "apendice": null
+    }
+    console.log(data);
+    console.log(data);
+    let token = await this.firmarDocumento(data, dataSistem);
+    const respAPi = await this.enviarDebito(bloque, token);
+    if (respAPi != null && respAPi.descripcionMsg != null && respAPi.descripcionMsg == 'RECIBIDO') {
+      await this.prisma.facturasBloques.update({
+        data: { actual: bloque!.actual + 1 },
+        where: { id_bloque: bloque.id_bloque },
+      });
+      await this.prisma.facturas.update({
+        where: { id_factura: factura.id_factura },
+        data: {
+          iva_retenido_dte_json: JSON.stringify(data),
+          iva_retenido_resp_dte_json: JSON.stringify(respAPi),
+          iva_retenido_fecha: new Date()
+        }
+      });
+    }
+    return respAPi;
+  }
+
   async enviarDebito(bloque, token) {
     const dataSistem = await this.prisma.generalData.findFirst();
     var data = {
@@ -300,12 +408,17 @@ export class ElectronicaService {
     };
     try {
       const respuesta: AxiosResponse = await axios.request(config);
+      console.log(respuesta.data);
       if (respuesta.data.descripcionMsg != null && respuesta.data.descripcionMsg == "RECIBIDO") {
         return respuesta.data
       } else {
         return respuesta.data.observaciones.toString();
       }
     } catch (error) {
+      console.log("error======");
+      console.log(error.response) // Mensaje de error
+      console.log(error.response.data) // Mensaje de error
+      console.log(error.response.data.observaciones) // Mensaje de error
       let msjError = '';
       if (error.response == undefined) {
         msjError += "Error de conexion con el serviodr de MH, favor intentarlo nuevamente mas tarde";
@@ -481,7 +594,6 @@ export class ElectronicaService {
       });
     }
 
-    console.log(factura.Cliente)
     const contingencia = await this.prisma.contingenciasDetalle.findFirst({ where: { id_factura: factura.id_factura }, include: { Contingencias: true } });
     let data = {
       "identificacion": {
@@ -597,7 +709,6 @@ export class ElectronicaService {
       });
     }
 
-    console.log(factura.Cliente)
     const contingencia = await this.prisma.contingenciasDetalle.findFirst({ where: { id_factura: factura.id_factura }, include: { Contingencias: true } });
     let data = {
       "identificacion": {
@@ -693,7 +804,6 @@ export class ElectronicaService {
       const respuesta: AxiosResponse = await axios.request(config);
       return respuesta.data.body;
     } catch (error) {
-      console.log(error.response)
       return null;
     }
   }
@@ -763,7 +873,6 @@ export class ElectronicaService {
         "motivoContingencia": contingencia.motivo
       }
     }
-    console.log(data)
     let token = await this.firmarDocumento(data, dataSistem);
     const respContingencia = await this.envairContingencia(dataSistem.nit, token, id_contingencia);
     this.iniciarEnvioContingencia(contingencia, id_contingencia);
@@ -814,7 +923,7 @@ export class ElectronicaService {
       }
       arrayTokens.push(token);
     }
-    await this.envairLoteFactura(arrayTokens, id_contingencia);
+    await this.enviarLoteFactura(arrayTokens, id_contingencia);
   }
 
 
@@ -842,11 +951,7 @@ export class ElectronicaService {
       data, // Los datos que se enviarán en el cuerpo de la solicitud
     };
     try {
-      console.log(path_)
       const respuesta: AxiosResponse = await axios.request(config);
-      console.log(respuesta.data)
-      console.log(respuesta.status)
-      console.log(respuesta.data.observaciones)
       if (respuesta.status == 200 && respuesta.data.estado != null && respuesta.data.estado == 'RECIBIDO') {
         await this.prisma.contingencias.update({
           where: { id_contingencia },
@@ -866,9 +971,6 @@ export class ElectronicaService {
       if (error.response == undefined) {
         msjError += "Error de conexion con el serviodr de MH, favor intentarlo nuevamente mas tarde";
       } else {
-        console.log(error.response) // Mensaje de error
-        console.log(error.response.data) // Mensaje de error
-        console.log(error.response.data.observaciones) // Mensaje de error
         if (error.response.data.observaciones != null && Array.isArray(error.response.data.observaciones)) {
           for (let index = 0; index < error.response.data.observaciones.length; index++) {
             const element = error.response.data.observaciones[index];
@@ -901,11 +1003,7 @@ export class ElectronicaService {
       }, // Los datos que se enviarán en el cuerpo de la solicitud
     };
     try {
-      console.log(path_)
       const respuesta: AxiosResponse = await axios.request(config);
-      console.log(respuesta.data)
-      console.log(respuesta.status)
-      console.log(respuesta.data.observaciones)
       if (respuesta.status == 200) {
         let token_api_fac = respuesta.data.body.token.replace("Bearer ", "");
         await this.prisma.generalData.update({
@@ -921,7 +1019,6 @@ export class ElectronicaService {
       if (error.response == undefined) {
         return "Error de conexion con el serviodr de MH, favor intentarlo nuevamente mas tarde";
       }
-      console.log(error) // Mensaje de error
       return null;
     }
   }
@@ -942,7 +1039,7 @@ export class ElectronicaService {
     return data.token_api_fac;
   }
 
-  async envairLoteFactura(facturas: any, id_contingencia: number) {
+  async enviarLoteFactura(facturas: any, id_contingencia: number) {
     const dataSistem = await this.prisma.generalData.findFirst();
     var data = {
       "ambiente": dataSistem.ambiente,
@@ -951,8 +1048,6 @@ export class ElectronicaService {
       "nitEmisor": eliminarGuionesYEspacios(dataSistem.nit),
       "documentos": [...facturas]
     }
-    console.log(data)
-    console.timeStamp()
     let path_ = `${this.configService.get('API_FACTURACION')}fesv/recepcionlote/`;
     var jwt = await this.validarToken();
     const config: AxiosRequestConfig = {
@@ -967,11 +1062,7 @@ export class ElectronicaService {
       data, // Los datos que se enviarán en el cuerpo de la solicitud
     };
     try {
-      console.log(path_)
       const respuesta: AxiosResponse = await axios.request(config);
-      console.log(respuesta.data)
-      console.log(respuesta.status)
-      console.log(respuesta.data.observaciones)
       if (respuesta.status == 200) {
         await this.prisma.contingencias.update({
           where: { id_contingencia },
@@ -986,8 +1077,6 @@ export class ElectronicaService {
       if (error.response == undefined) {
         msjError += "Error de conexion con el serviodr de MH, favor intentarlo nuevamente mas tarde";
       } else {
-        console.log(error.response.data) // Mensaje de error
-        console.log(error.response.data.observaciones) // Mensaje de error
         if (error.response.data.observaciones != null && Array.isArray(error.response.data.observaciones)) {
           for (let index = 0; index < error.response.data.observaciones.length; index++) {
             const element = error.response.data.observaciones[index];
@@ -1011,8 +1100,6 @@ export class ElectronicaService {
       "codigoGeneracion": "2",
       "documento": token
     }
-    console.log(data)
-    console.timeStamp()
     let path_ = `${this.configService.get('API_FACTURACION')}fesv/recepciondte`;
     var jwt = await this.validarToken();
     const config: AxiosRequestConfig = {
@@ -1027,11 +1114,7 @@ export class ElectronicaService {
       data, // Los datos que se enviarán en el cuerpo de la solicitud
     };
     try {
-      console.log(path_)
       const respuesta: AxiosResponse = await axios.request(config);
-      console.log(respuesta.data)
-      console.log(respuesta.status)
-      console.log(respuesta.data.observaciones)
       if (respuesta.status == 200) {
         await this.prisma.facturas.update({
           where: { id_factura: factura.id_factura },
@@ -1065,17 +1148,18 @@ export class ElectronicaService {
         if (verifyEmail(factura_s.Cliente.correo ?? "") && factura_s.Cliente.correo.length > 0) {
           this.serviceEmail.sendEmailInvoice(factura_s, jsonDte);
         }
-
+        if (Number(factura_s.iva_retenido ?? 0) > 0) {
+          this.retencionFacturaElectronica(factura_s);
+          setTimeout(() => {
+          }, 5000);
+        }
       }
       return respuesta.data;
     } catch (error) {
-      console.log("error=====================>")
       let msjError = '';
       if (error.response == undefined) {
         msjError += "Error de conexion con el serviodr de MH, favor intentarlo nuevamente mas tarde";
       } else {
-        console.log(error.response.data) // Mensaje de error
-        console.log(error.response.data.observaciones) // Mensaje de error
         if (error.response.data.observaciones != null && Array.isArray(error.response.data.observaciones)) {
           for (let index = 0; index < error.response.data.observaciones.length; index++) {
             const element = error.response.data.observaciones[index];
@@ -1131,8 +1215,6 @@ export class ElectronicaService {
     }
 
     const contingencia = await this.prisma.contingenciasDetalle.findFirst({ where: { id_factura: factura.id_factura }, include: { Contingencias: true } });
-    console.log("contingencia")
-    console.log(contingencia)
     let data = {
       "identificacion": {
         "version": factura.Bloque.Tipo.version,
@@ -1211,7 +1293,7 @@ export class ElectronicaService {
         "ivaPerci1": 0,
         "ivaRete1": factura.iva_retenido,
         "reteRenta": 0,
-        "montoTotalOperacion": factura.total,
+        "montoTotalOperacion": parseFloat((factura.total + (factura.iva_retenido ?? 0)).toFixed(2)),
         "totalNoGravado": 0,
         "totalPagar": factura.total,
         "totalLetras": NumeroALetras(parseFloat(factura.total.toFixed(2))).toUpperCase(),
@@ -1230,9 +1312,6 @@ export class ElectronicaService {
       },
       "apendice": null
     }
-    console.log("afkldsjhgkjsdhfgkjsdfklgjsldkjhfgsjldhkfghjksdfghjlksdfhjghkjldsgfhkjsdfgjhldf")
-    console.log(data)
-    console.log("afkldsjhgkjsdhfgkjsdfklgjsldkjhfgsjldhkfghjksdfghjlksdfhjghkjldsgfhkjsdfgjhldf")
     await this.prisma.facturas.update({
       where: { id_factura: factura.id_factura },
       data: {
