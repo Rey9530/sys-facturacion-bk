@@ -470,6 +470,12 @@ export class ElectronicaService {
     }
 
     const contingencia = await this.prisma.contingenciasDetalle.findFirst({ where: { id_factura: factura.id_factura }, include: { Contingencias: true } });
+    let numDocumento: any = null;
+    if (factura.Cliente.dui != null && factura.Cliente.dui.length > 0 && factura.Cliente.DTETipoDocumentoIdentificacion != null && factura.Cliente.DTETipoDocumentoIdentificacion == "13") { //36
+      numDocumento = factura.Cliente.dui;
+    } else {
+      numDocumento = eliminarGuionesYEspacios(factura.Cliente.dui)
+    }
     let data = {
       "identificacion": {
         "version": factura.Bloque.Tipo.version,
@@ -509,7 +515,7 @@ export class ElectronicaService {
       },
       "receptor": {
         "tipoDocumento": factura.Cliente.DTETipoDocumentoIdentificacion != null ? factura.Cliente.DTETipoDocumentoIdentificacion.codigo : null,
-        "numDocumento": (factura.Cliente.dui != null && factura.Cliente.dui.length > 0) ? eliminarGuionesYEspacios(factura.Cliente.dui) : null,
+        "numDocumento": numDocumento,
         "nrc": factura.Cliente.registro_nrc != null && factura.Cliente.registro_nrc != "" && factura.Cliente.registro_nrc != "N/A" ? eliminarGuionesYEspacios(factura.Cliente.registro_nrc) : null,
         "nombre": factura.Cliente.nombre,
         "codActividad": factura.Cliente.DTEActividadEconomica != null ? factura.Cliente.DTEActividadEconomica.codigo : null,
@@ -1149,8 +1155,8 @@ export class ElectronicaService {
           this.serviceEmail.sendEmailInvoice(factura_s, jsonDte);
         }
         if (Number(factura_s.iva_retenido ?? 0) > 0) {
-          this.retencionFacturaElectronica(factura_s);
           setTimeout(() => {
+            this.retencionFacturaElectronica(factura_s);
           }, 5000);
         }
       }
