@@ -224,7 +224,7 @@ export class FacturaService {
           id_catalogo: detalle.id_catalogo,
           precio_unitario: formatNumberDecimal(detalle.precio_unitario),
           codigo: detalle.codigo,
-          nombre: detalle.nombre,
+          nombre: detalle.item.nombre_producto ?? '',
           precio_sin_iva: formatNumberDecimal(detalle.precio_sin_iva),
           precio_con_iva: formatNumberDecimal(detalle.precio_con_iva),
           cantidad: detalle.cantidad,
@@ -423,7 +423,8 @@ export class FacturaService {
         },
       },
     });
-    data = data.map(e => {
+    data = data.map((e: any) => {
+      e.nombre_producto = e.nombre
       e.nombre = `${e.nombre} (${e.codigo})`
       return e;
     })
