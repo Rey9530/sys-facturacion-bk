@@ -117,6 +117,9 @@ export class ElectronicaService {
       }
       return "";
     } catch (error) {
+      console.log(error);
+      console.log(error.response);
+      console.log(error.response.data);
       if (error.response == undefined) {
         return "Error de conexion con el serviodr de MH, favor intentarlo nuevamente mas tarde";
       }
@@ -959,17 +962,23 @@ export class ElectronicaService {
     try {
       const respuesta: AxiosResponse = await axios.request(config);
       if (respuesta.status == 200 && respuesta.data.estado != null && respuesta.data.estado == 'RECIBIDO') {
+        console.log(respuesta.data);
         await this.prisma.contingencias.update({
           where: { id_contingencia },
           data: {
             json_response: JSON.stringify(respuesta.data)
           }
         });
+
       } else {
+        console.log(respuesta.data);
         throw new InternalServerErrorException(respuesta.data.observaciones.toString())
       }
       return respuesta.data;
     } catch (error) {
+      console.log(error);
+      console.log(error.response);
+      console.log(error.response.data);
       if ((error.response.data == null) && error.response.message != null) {
         throw new InternalServerErrorException(error.response.message)
       }
@@ -1022,6 +1031,9 @@ export class ElectronicaService {
       }
       return null;
     } catch (error) {
+      console.log(error);
+      console.log(error.response);
+      console.log(error.response.data);
       if (error.response == undefined) {
         return "Error de conexion con el serviodr de MH, favor intentarlo nuevamente mas tarde";
       }
@@ -1079,6 +1091,9 @@ export class ElectronicaService {
       }
       return respuesta.data;
     } catch (error) {
+      console.log(error);
+      console.log(error.response);
+      console.log(error.response.data);
       let msjError = '';
       if (error.response == undefined) {
         msjError += "Error de conexion con el serviodr de MH, favor intentarlo nuevamente mas tarde";
@@ -1162,6 +1177,9 @@ export class ElectronicaService {
       }
       return respuesta.data;
     } catch (error) {
+      console.log(error);
+      console.log(error.response);
+      console.log(error.response.data);
       let msjError = '';
       if (error.response == undefined) {
         msjError += "Error de conexion con el serviodr de MH, favor intentarlo nuevamente mas tarde";
@@ -1260,7 +1278,7 @@ export class ElectronicaService {
       },
       "receptor": {
         "nombreComercial": factura.Cliente.razon_social != null ? factura.Cliente.razon_social : null,
-        "nit": (factura.Cliente.dui != null && factura.Cliente.dui.length > 0) ? eliminarGuionesYEspacios(factura.Cliente.dui) : null,
+        "nit": eliminarGuionesYEspacios(factura.Cliente.dui), //(factura.Cliente.dui != null && factura.Cliente.dui.length > 0) ? eliminarGuionesYEspacios(factura.Cliente.dui) : null,
         "nrc": factura.Cliente.registro_nrc != null && factura.Cliente.registro_nrc != "" && factura.Cliente.registro_nrc != "N/A" ? eliminarGuionesYEspacios(factura.Cliente.registro_nrc) : null,
         "nombre": factura.Cliente.nombre,
         "codActividad": factura.Cliente.DTEActividadEconomica != null ? factura.Cliente.DTEActividadEconomica.codigo : null,
@@ -1317,7 +1335,7 @@ export class ElectronicaService {
         "placaVehiculo": null
       },
       "apendice": null
-    }
+    } 
     await this.prisma.facturas.update({
       where: { id_factura: factura.id_factura },
       data: {
