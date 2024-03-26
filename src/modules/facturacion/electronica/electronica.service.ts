@@ -119,7 +119,7 @@ export class ElectronicaService {
     } catch (error) {
       console.log(error);
       console.log(error.response);
-      console.log(error.response.data);
+      
       if (error.response == undefined) {
         return "Error de conexion con el serviodr de MH, favor intentarlo nuevamente mas tarde";
       }
@@ -978,7 +978,7 @@ export class ElectronicaService {
     } catch (error) {
       console.log(error);
       console.log(error.response);
-      console.log(error.response.data);
+      
       if ((error.response.data == null) && error.response.message != null) {
         throw new InternalServerErrorException(error.response.message)
       }
@@ -1033,7 +1033,7 @@ export class ElectronicaService {
     } catch (error) {
       console.log(error);
       console.log(error.response);
-      console.log(error.response.data);
+      
       if (error.response == undefined) {
         return "Error de conexion con el serviodr de MH, favor intentarlo nuevamente mas tarde";
       }
@@ -1093,7 +1093,7 @@ export class ElectronicaService {
     } catch (error) {
       console.log(error);
       console.log(error.response);
-      console.log(error.response.data);
+      
       let msjError = '';
       if (error.response == undefined) {
         msjError += "Error de conexion con el serviodr de MH, favor intentarlo nuevamente mas tarde";
@@ -1179,7 +1179,7 @@ export class ElectronicaService {
     } catch (error) {
       console.log(error);
       console.log(error.response);
-      console.log(error.response.data);
+      
       let msjError = '';
       if (error.response == undefined) {
         msjError += "Error de conexion con el serviodr de MH, favor intentarlo nuevamente mas tarde";
